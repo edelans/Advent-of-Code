@@ -1,7 +1,8 @@
 # Python 3.x
 
 import re
-import math
+from collections import defaultdict
+
 
 def Input(day):
     "Open this day's input file."
@@ -9,10 +10,7 @@ def Input(day):
     return open(filename)
 
 
-
 # PART 1
-
-regex = r"^(?P<register>\w+)\s(?P<operation>inc|dec)\s(?P<value>-?\d+)\sif\s(?P<cond_register>\w+)\s(?P<cond_operation><|>|<=|>=|==|!=)\s(?P<cond_value>-?\d+)"
 
 
 test_input = """b inc 5 if a > 1
@@ -21,46 +19,31 @@ c dec -10 if a >= 1
 c inc -20 if c == 10"""
 
 
-def part1(lines):
-    registers = {}
+def reg_max(lines):
+    regex = r"^(?P<register>\w+)\s(?P<operation>inc|dec)\s(?P<value>-?\d+)\sif\s(?P<cond_register>\w+)\s(?P<cond_operation><|>|<=|>=|==|!=)\s(?P<cond_value>-?\d+)"
+    registers = defaultdict(int)  # default value of int is 0
+    maxv = 0
 
     for line in lines:
         matches = re.search(regex, line)
         if matches:
-            condition = " ".join([str(registers.get(matches.group('cond_register'), 0)), matches.group('cond_operation'), matches.group('cond_value')])
+            condition = str(registers.get(matches.group('cond_register'), 0)) + " " + matches.group('cond_operation') + matches.group('cond_value')
             if eval(condition):
                 if matches.group('operation') == 'inc':
-                    registers[matches.group('register')] = registers.get(matches.group('register'), 0) + int(matches.group('value'))
+                    registers[matches.group('register')] += int(matches.group('value'))
                 if matches.group('operation') == 'dec':
-                    registers[matches.group('register')] = registers.get(matches.group('register'), 0) - int(matches.group('value'))
+                    registers[matches.group('register')] -= int(matches.group('value'))
+                maxv = max(registers[matches.group('register')], maxv)
+    return max(registers.values()), maxv
 
 
-    return max(registers.values())
+assert reg_max(test_input.split('\n'))[0] == 1
+assert reg_max(test_input.split('\n'))[1] == 10
 
-
-assert part1(test_input.split('\n')) == 1
-# print(part1(Input(8).readlines()))
+print(reg_max(Input(8).readlines()))
 
 
 
 # part 2
-
-def part2(lines):
-    registers = {}
-    max = 0
-
-    for line in lines:
-        matches = re.search(regex, line)
-        if matches:
-            condition = " ".join([str(registers.get(matches.group('cond_register'), 0)), matches.group('cond_operation'), matches.group('cond_value')])
-            if eval(condition):
-                if matches.group('operation') == 'inc':
-                    registers[matches.group('register')] = registers.get(matches.group('register'), 0) + int(matches.group('value'))
-                if matches.group('operation') == 'dec':
-                    registers[matches.group('register')] = registers.get(matches.group('register'), 0) - int(matches.group('value'))
-                if registers[matches.group('register')] > max:
-                    max = registers[matches.group('register')]
-    return max
-
-assert part2(test_input.split('\n')) == 10
-# print(part2(Input(8).readlines()))
+#
+# amended reg_max with lines containing maxv
