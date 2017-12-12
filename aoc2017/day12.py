@@ -1,5 +1,4 @@
 import re
-from functools import reduce
 
 
 def Input(day):
@@ -37,9 +36,6 @@ def solve1(lines):
         node, child = line.split('<->')
         children_dict[int(node)] = list(map(lambda x: int(x), child.split(',')))
 
-    # aborted idea
-    # reduce((lambda acc, update: x * y), [1, 2, 3, 4], [])
-
     group0 = set()
     nodes_to_explore = set([0])
 
@@ -54,3 +50,44 @@ def solve1(lines):
 assert solve1(teststr.splitlines()) == 6
 
 print("The result for part 1 is : {}".format(solve1(Input(12).readlines())))
+
+
+# part 2
+
+
+def build_dict(lines):
+    children_dict = {}
+    for line in lines:
+        node, child = line.split('<->')
+        children_dict[int(node)] = list(map(lambda x: int(x), child.split(',')))
+    return children_dict
+
+
+def find_group_members(children_dict, N_id):
+    group0 = set()
+    nodes_to_explore = set([N_id])
+
+    while len(nodes_to_explore) > 0:
+        node = nodes_to_explore.pop()
+        group0.add(node)
+        for i in children_dict[node]:
+            nodes_to_explore.add(i)
+        nodes_to_explore -= group0
+    return group0
+
+
+def solve2(lines):
+    children_dict = build_dict(lines)
+    nodes_to_group = set(children_dict.keys())
+    group_nb = 0
+
+    while len(nodes_to_group) > 0:
+        group_nb += 1
+        node = nodes_to_group.pop()
+        nodes_to_group -= find_group_members(children_dict, node)
+
+    return group_nb
+
+assert solve2(teststr.splitlines()) == 2
+
+print("The result for part 2 is : {}".format(solve2(Input(12).readlines())))
