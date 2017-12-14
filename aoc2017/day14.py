@@ -69,9 +69,18 @@ def h_to_bin(hash):
 
 def create_hash_matrix(input):
     matrix = []
-    for i in range(0, 127):
+    for i in range(0, 128):
         matrix.append([x for x in h_to_bin(hash(input + '-' + str(i)))])
     return matrix
+
+
+def create_bit_dict(input):
+    bit_dict = {}
+    for i in range(0, 128):
+        h = h_to_bin(hash(input + '-' + str(i)))
+        for j in range(0, 128):
+            bit_dict[(i, j)] = h[j]
+    return bit_dict
 
 
 # def solve1(input):
@@ -96,4 +105,60 @@ def solve1(input):
 # print(testres)
 # assert solve1(teststr) == 8108
 
-print(solve1('ljoxqyyw'))
+# print(solve1('ljoxqyyw'))
+
+
+def neighbors_4(pos):
+    return [(pos[0]-1, pos[1]), (pos[0]+1, pos[1]), (pos[0], pos[1]-1), (pos[0], pos[1]+1)]
+
+
+def solve2(input):
+    bit_dict = {}
+
+    for i in range(0, 128):
+        h = h_to_bin(hash(input + '-' + str(i)))
+        for j in range(0, 128):
+            if int(h[j]) == 1:
+                bit_dict[(i, j)] = h[j]
+
+    colored_dict = {}
+    positions_to_color = set(list(bit_dict.keys()))
+    print("positions_to_color : {}".format(positions_to_color))
+    print("init complete, starting coloration")
+
+    color = 0
+    while len(positions_to_color) > 0:
+        print("updating color to : {}".format(color))
+        color += 1
+        print("startin coloration for color {}".format(color))
+        points_to_color_in_that_color = set()
+        points_to_color_in_that_color.add(positions_to_color.pop())
+
+        while len(points_to_color_in_that_color) > 0:
+            point_to_color = points_to_color_in_that_color.pop()
+
+            # color the point
+            print("coloring point {}".format(point_to_color))
+            colored_dict[point_to_color] = color
+            if point_to_color in positions_to_color:
+                positions_to_color.remove(point_to_color)
+
+            # look for neighbors to color
+            for neighbor in neighbors_4(point_to_color):
+                print("neighbor is {} has value {}".format(neighbor, bit_dict.get(neighbor, 0)))
+                if int(bit_dict.get(neighbor, 0)) == 1:
+                    if neighbor not in colored_dict:
+                        print("neighbor is {} colorable".format(neighbor))
+                        points_to_color_in_that_color.add(neighbor)
+    return color, colored_dict
+
+
+res, colored_dict = solve2('ljoxqyyw')
+
+# for i in range(0, 128):
+#     line = []
+#     for j in range(0, 128):
+#         line.append(colored_dict.get((i,j), 0))
+#     print(line)
+
+print(res)
