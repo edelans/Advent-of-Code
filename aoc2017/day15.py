@@ -48,20 +48,46 @@ def solve1(initA, initB):
         bvalueA = bin(valueA)[2:].zfill(32)
         valueB = generator(initB, 48271, valueB)
         bvalueB = bin(valueB)[2:].zfill(32)
+        # print('\n')
+        # print(bvalueA[16:])
+        # print(bvalueB[16:])
         if bvalueA[16:] == bvalueB[16:]:
             count += 1
-    print(count)
     return count
 
 
-print("The result for part 1 is : {}".format(solve1(parse_numbers(inputstr)[0], parse_numbers(inputstr)[1])))
+# print("The result for part 1 is : {}".format(solve1(parse_numbers(inputstr)[0], parse_numbers(inputstr)[1])))
 
 
 # part 2
 
 
-def solve2():
-    pass
+def solve2(initA, initB, iterations):
+    count = 0
+    valueA = None
+    valueB = None
+    for _ in range(iterations):
+        valueA = generator(initA, 16807, valueA)
+        while valueA % 4 != 0:
+            valueA = generator(initA, 16807, valueA)
+        bvalueA = bin(valueA)[2:].zfill(32)
+        valueB = generator(initB, 48271, valueB)
+        while valueB % 8 != 0:
+            valueB = generator(initB, 48271, valueB)
+        bvalueB = bin(valueB)[2:].zfill(32)
+        # print('\n')
+        # print(valueA)
+        # print(valueB)
+        # print('\n')
+        # print(bvalueA[16:])
+        # print(bvalueB[16:])
+        if bvalueA[16:] == bvalueB[16:]:
+            count += 1
+    return count
+
+# test = solve2(parse_numbers(teststr)[0], parse_numbers(teststr)[1], 5)
+# print("The result for part 2 is : {}".format(test))
 
 
-# print("The result for part 2 is : {}".format(solve2(Input(13).readlines())))
+res = solve2(parse_numbers(inputstr)[0], parse_numbers(inputstr)[1], 5000000)
+print("The result for part 2 is : {}".format(res))
