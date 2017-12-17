@@ -23,7 +23,7 @@ assert(solve1(teststr.splitlines()) == XXXXX)
 
 
 
-# def solve2(operations):
+# def solve2(input):
 #     pass
 #
 # res = solve2(parse_words(Input(DAY).readline()))
