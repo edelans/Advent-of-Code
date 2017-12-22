@@ -24,7 +24,7 @@ def solve1(lines):
                 print(min)
                 print("new leader @ metric {} for line #{} : {}".format(metric, i, line))
 
-            if metric == min:
+            elif metric == min:
                 print("equality @ metric {} for line #{} : {}".format(metric, i, line))
     return idmin
 
