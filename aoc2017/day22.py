@@ -4,13 +4,13 @@ from aoc_utilities import *
 from collections import defaultdict
 DAY = 22
 
+
 # Part 1
 
 teststr = """..#
 #..
 ...
 """
-
 
 def parse(lines):
     infected = set()
@@ -23,8 +23,8 @@ def parse(lines):
                 infected.add(x + y * 1j)
     return infected
 
-print(parse(teststr.splitlines()))
 
+print(parse(teststr.splitlines()))
 
 
 def solve1(lines, bursts):
@@ -55,7 +55,6 @@ def solve1(lines, bursts):
 #
 # res = solve1((Input(DAY).readlines()), 10000)
 # print(res)
-
 
 
 def solve2(lines, bursts):
