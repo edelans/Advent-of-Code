@@ -1,6 +1,6 @@
 # Python 3.x
 
-from aoc_utilities import *
+from aoc_utilities import Input
 DAY = 1
 
 # Part 1
