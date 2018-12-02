@@ -12,6 +12,7 @@ PART1
 """
 
 def solve1(input):
+    return
 
 
 
@@ -21,19 +22,20 @@ PART 2
 
 
 def solve2(input):
+    return
 
 
 
-
-
-if sys.argv[2] == 1:
+if sys.argv[1] == '1':
     res = solve1((Input(DAY).readlines()))
     print(res)
-    if sys.argv[3] && sys.argv[3] == 's':
-        submit1(res)
+    if len(sys.argv) == 3:
+        if sys.argv[2] == 's':
+            submit1(res)
 
-if sys.argv[2] == 2:
+if sys.argv[1] == '2':
     res = solve1((Input(DAY).readlines()))
     print(res)
-    if sys.argv[3] && sys.argv[3] == 's':
-        submit2(res)
+    if len(sys.argv) == 3:
+        if sys.argv[2] == 's':
+            submit2(res)
