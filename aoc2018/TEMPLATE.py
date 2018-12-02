@@ -29,16 +29,22 @@ def solve2(input):
     pass
 
 
-if sys.argv[1] == '1':
-    res = solve1((Input(DAY).readlines()))
-    print(res)
-    if len(sys.argv) == 3:
-        if sys.argv[2] == 's':
-            aocd.submit1(res)
+"""
+Use script args to execute the right function.
+"""
+if __name__ == '__main__':
+    if sys.argv[1] == '1':
+        res = solve1((Input(DAY).readlines()))
+        print(res)
+        if len(sys.argv) == 3:
+            if sys.argv[2] == 's':
+                print("attempting to submit the response '{}' to part 1: \n\n".format(res))
+                aocd.submit1(res)
 
-if sys.argv[1] == '2':
-    res = solve2((Input(DAY).readlines()))
-    print(res)
-    if len(sys.argv) == 3:
-        if sys.argv[2] == 's':
-            aocd.submit2(res)
+    if sys.argv[1] == '2':
+        res = solve2((Input(DAY).readlines()))
+        print(res)
+        if len(sys.argv) == 3:
+            if sys.argv[2] == 's':
+                print("attempting to submit the response '{}' to part 2: \n\n".format(res))
+                aocd.submit2(res)
