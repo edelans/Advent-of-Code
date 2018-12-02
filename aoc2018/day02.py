@@ -36,7 +36,7 @@ PART 2
 
 def solve2(input):
     """Solves part2."""
-    for i in range(0, len(input)):
+    for i in range(0, len(input) - 1):
         ref = input[i]
         for j in range(i+1, len(input)):
             # previous candidates were tested with previous references before
