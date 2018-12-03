@@ -54,7 +54,7 @@ def solve2(input):
     # Store the mapping in a dict. Key is coordinates (tuple), value is a list of ID claims.
     mapping = {}
 
-    # store claim ids
+    # store claim ids in a set so we can purge him from overlaping ids later
     id_set = set([])
 
     for claim in input:
@@ -83,7 +83,7 @@ def solve2(input):
     for overlap_id in overlaping_ids:
         id_set.discard(overlap_id)
 
-    return id_set
+    return id_set.pop()
 
 
 """
