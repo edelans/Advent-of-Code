@@ -103,11 +103,6 @@ def solve1(input):
     return int(alpha_sleeper_id) * chosen_minute
 
 
-
-
-
-
-
 """
 PART 2
 """
@@ -115,44 +110,45 @@ PART 2
 
 def solve2(input):
     """Solves part2."""
+    shifts = sorted(input)
+    guards = {}
+    # guard_id: {
+    #   "shift": [{start: }, {duration: }, ..]
+    #   "total_time_asleep" : int
+    # }
+    i = 0
+    while i < len(shifts):
+        timestamp0, comment0 = shifts[i].split('] ')
+        guard_ID = re.findall(r'-?\d+', comment0)[0]
+        while 'asleep' in shifts[i+1]:
+            timestamp1, comment1 = shifts[i+1].split('] ')
+            timestamp2, comment2 = shifts[i+2].split('] ')
+            duration = datetime.datetime.strptime(timestamp2[1:], '%Y-%m-%d %H:%M') - datetime.datetime.strptime(timestamp1[1:], '%Y-%m-%d %H:%M')
+            if guard_ID in guards:
+                guards[guard_ID]["shift"] += [{"start": datetime.datetime.strptime(timestamp1[1:], '%Y-%m-%d %H:%M'), "duration": duration}]
+            else:
+                guards[guard_ID] = {"shift": [{"start": datetime.datetime.strptime(timestamp1[1:], '%Y-%m-%d %H:%M'), "duration": duration}], "total_time_asleep": 0}
+            guards[guard_ID]["total_time_asleep"] += duration.total_seconds()
+            i = i + 2
+            if i+1 >= len(shifts):
+                break
+        i = i + 1
 
-    # must parse "#id @ x,y: widthxheight" as in following example :
-    # 1 @ 1,3: 4x4
-    regex = r"^#(?P<id>\d+)\s@\s(?P<x>\d+),(?P<y>\d+):\s(?P<width>\d+)x(?P<height>\d+)"
+    for id in guards:
+        guards[id]["minute_stats"] = {}
+        for siesta in guards[id]['shift']:
+            for i in range(int(siesta["start"].minute), int(siesta["start"].minute) + int(siesta["duration"].total_seconds()/60)):
+                guards[id]["minute_stats"][i] = guards[id]["minute_stats"].get(i, 0) + 1
 
-    # Store the mapping in a dict. Key is coordinates (tuple), value is a list of ID claims.
-    mapping = {}
+    max_asleep_minute = (0, 0)  # minute, count
+    for k, v in guards.items():
+        most_asleep_minute_count = max(v["minute_stats"].items(), key=lambda x: x[1])
+        if most_asleep_minute_count[1] > max_asleep_minute[1]:
+            print("new max sleeper #{} totaling {} times minute {} asleep".format(k, most_asleep_minute_count[1], most_asleep_minute_count[0]))
+            alpha_sleeper_id = k
+            max_asleep_minute = most_asleep_minute_count
 
-    # store claim ids in a set so we can purge him from overlaping ids later
-    id_set = set([])
-
-    for claim in input:
-        matches = re.search(regex, claim)
-        if matches:
-            id = matches.group('id')
-            x, y = int(matches.group('x')), int(matches.group('y'))
-            width, height = int(matches.group('width')), int(matches.group('height'))
-            id_set.add(id)
-            for i in range(x, x + width):
-                for j in range(y, y + height):
-                    mapping[(i, j)] = mapping.get((i, j), []) + [id]
-
-
-    # part 2 really starts here
-
-    overlaping_ids = set([l for k in mapping.values() if len(k) >= 2 for l in k])
-
-    # Tip : remember that nested comprehension list follow the same order of the corresponding for loop
-    # see https://spapas.github.io/2016/04/27/python-nested-list-comprehensions/
-    # for k in mapping.values():
-    #     if len(k) >= 2:
-    #         for l in k:
-    #             l
-
-    for overlap_id in overlaping_ids:
-        id_set.discard(overlap_id)
-
-    return id_set.pop()
+    return int(alpha_sleeper_id) * max_asleep_minute[0]
 
 
 """
