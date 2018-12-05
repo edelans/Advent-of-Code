@@ -15,54 +15,6 @@ DAY = '04'
 PART1
 """
 
-"""
-[1518-11-22 00:49] wakes up
-[1518-05-18 00:01] Guard #1171 begins shift
-[1518-11-20 00:28] wakes up
-[1518-10-27 00:37] wakes up
-[1518-08-14 00:39] falls asleep
-[1518-09-08 00:51] falls asleep
-[1518-07-27 00:57] wakes up
-[1518-10-21 00:00] Guard #2699 begins shift
-[1518-09-09 00:16] falls asleep
-[1518-03-21 00:51] wakes up
-[1518-05-21 23:59] Guard #863 begins shift
-"""
-"""
-shifts = {} # id: [{day: }, {start: }, {end: }, {duration: }]
-
-{day: {start: end: }, {duration: }, {id: } }
-
-{
-  "1518-03-21" : {
-    "start": "1518-03-21 00:10"
-    "end":"1518-03-21 00:51"
-    "duration": 41
-    "id": 863
-  }
-}
-
-datetime.datetime.strptime('2012-07-22 16:19', '%Y-%m-%d %H:%M')
-"""
-
-
-# def solve1(input):
-#     """Solves part 1."""
-#     shifts = {}
-#     for line in input:
-#         timestamp, comment = line.split('] ')
-#         timestamp = datetime.datetime.strptime(timestamp[1:], '%Y-%m-%d %H:%M')
-#         d = datetime.timedelta(hours=1)
-#         day = shift[(timestamp + d).strftime('%Y-%m-%d')]
-#         if 'asleep' in comment:
-#             shift[day]["start"] = timestamp
-#         if 'wakes' in comment:
-#             shift[day]["end"] = timestamp
-#         if 'Guard' in comment:
-#             shift[day]["id"] = timestamp
-#         if 'end' in shift[day].values() and 'start' in shift[day].values():
-#
-
 def solve1(input):
     """Solves part 1."""
     shifts = sorted(input)
