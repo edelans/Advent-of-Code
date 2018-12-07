@@ -66,6 +66,11 @@ The getter has an handy second argument to use a default value if the key is not
     dict["c"] = dict.get("c", 0) + 1
     dict  #  {"a": 1, "b": 2, "c": 1}
 
+There is also a default setter :
+
+    for i in range(start, stop):
+        guards.setdefault(current_guard, []).append(i)
+
 There is also the defaultdict from the collections module : defaultdict is a subclass of the built-in dict class.
 
     from collections import Counter, defaultdict
@@ -105,3 +110,7 @@ cycle through an iterable :
     itertools.cycle(input)
     for delta in itertools.cycle(input):
         # infinite loop of 0 and 1
+
+index of minimum element
+
+    values.index(min(values))
