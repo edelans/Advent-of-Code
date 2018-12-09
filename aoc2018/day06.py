@@ -2,9 +2,9 @@
 """Template file to be used as boilerplate for each day puzzle."""
 from aoc_utilities import Input
 import aocd
+from collections import Counter
 import sys
 # import itertools
-from collections import Counter, defaultdict
 
 
 # day must be 2 digit
@@ -17,6 +17,7 @@ PART1
 
 
 def man_dis(point1, point2):
+    """Return manathan distance between 2 points."""
     return abs(point2[1] - point1[1]) + abs(point2[0] - point1[0])
 
 
@@ -63,7 +64,6 @@ def solve1(input):
     return next(i[1] for i in Counter(mapping.values()).most_common() if i[0] not in infinite_ids)
 
 
-
 """
 PART 2
 """
@@ -83,22 +83,20 @@ def solve2(input):
     k3, min_y = min(mapping.items(), key=lambda i: i[0][1])[0]
     k4, max_y = max(mapping.items(), key=lambda i: i[0][1])[0]
 
-
     safe_region_size = 0
     for x in range(min_x, max_x + 1):
         for y in range(min_y, max_y + 1):
-            if sum(man_dis((x,y), p) for p in mapping.keys()) < 10000:
+            if sum(man_dis((x, y), p) for p in mapping.keys()) < 10000:
                 safe_region_size += 1
 
     return safe_region_size
-
 
 
 """
 Use script args to execute the right function.
 """
 if __name__ == '__main__':
-    if len(sys.argv)>1 and sys.argv[1] == '1':
+    if len(sys.argv) > 1 and sys.argv[1] == '1':
         res = solve1((Input(DAY).readlines()))
         print(res)
         if len(sys.argv) == 3:
@@ -106,7 +104,7 @@ if __name__ == '__main__':
                 print("attempting to submit the response '{}' to part 1: \n\n".format(res))
                 aocd.submit1(res)
 
-    if len(sys.argv)>1 and sys.argv[1] == '2':
+    if len(sys.argv) > 1 and sys.argv[1] == '2':
         res = solve2((Input(DAY).readlines()))
         print(res)
         if len(sys.argv) == 3:
