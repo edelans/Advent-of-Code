@@ -71,7 +71,27 @@ PART 2
 
 def solve2(input):
     """Solves part2."""
-    pass
+    mapping = {}
+    cnt = 1
+    for line in input:
+        x, y = map(int, line.split(", "))
+        mapping[(x, y)] = 'l' + str(cnt)
+        cnt += 1
+
+    min_x, k1 = min(mapping.items(), key=lambda i: i[0][0])[0]
+    max_x, k2 = max(mapping.items(), key=lambda i: i[0][0])[0]
+    k3, min_y = min(mapping.items(), key=lambda i: i[0][1])[0]
+    k4, max_y = max(mapping.items(), key=lambda i: i[0][1])[0]
+
+
+    safe_region_size = 0
+    for x in range(min_x, max_x + 1):
+        for y in range(min_y, max_y + 1):
+            if sum(man_dis((x,y), p) for p in mapping.keys()) < 10000:
+                safe_region_size += 1
+
+    return safe_region_size
+
 
 
 """
