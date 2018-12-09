@@ -18,28 +18,25 @@ PART1
 def solve1(input):
     """Solves part 1."""
     requirements = {}  # is steps 3 requires steps 1 and 2 : {3 : [1, 2]}
-    steps = set()
     # build requirements mapping
     for line in input:
         req, st = line.split(' ')[1], line.split(' ')[7]
         requirements[st] = requirements.get(st, []) + [req]
-        steps.add(req)
-        steps.add(st)
+        requirements[req] = requirements.get(req, [])
     print(requirements)
 
     # solve requirements one at a time
     res = ''
     while requirements != {}:
-        for i in sorted(steps):
+        for i in sorted(requirements.keys()):
             if requirements.get(i, []) == []:
                 res += i
                 if i in requirements:
                     del requirements[i]
-                steps -= set(i)
                 for j in requirements:
                     if i in requirements[j]:
                         requirements[j].remove(i)
-                break  # because requirement simplification may have altered order sorted(steps)
+                break  # because requirement simplification may have altered order sorted(requirements.key())
     return res
 
 
