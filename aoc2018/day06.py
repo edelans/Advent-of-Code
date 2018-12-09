@@ -4,6 +4,8 @@ from aoc_utilities import Input
 import aocd
 import sys
 # import itertools
+from collections import Counter, defaultdict
+
 
 # day must be 2 digit
 DAY = '06'
@@ -14,23 +16,54 @@ PART1
 """
 
 
+def man_dis(point1, point2):
+    return abs(point2[1] - point1[1]) + abs(point2[0] - point1[0])
+
+
 def solve1(input):
     """Solves part 1."""
     mapping = {}
     cnt = 1
     for line in input:
-        print(line)
         x, y = map(int, line.split(", "))
-        mapping[(x,y)] = 'l' + str(cnt)
+        mapping[(x, y)] = 'l' + str(cnt)
         cnt += 1
 
+    min_x, k1 = min(mapping.items(), key=lambda i: i[0][0])[0]
+    max_x, k2 = max(mapping.items(), key=lambda i: i[0][0])[0]
+    k3, min_y = min(mapping.items(), key=lambda i: i[0][1])[0]
+    k4, max_y = max(mapping.items(), key=lambda i: i[0][1])[0]
 
-    min_x = print(min(mapping.items(), key=lambda i: i[0][0])[0][0])
-    max_x = print(max(mapping.items(), key=lambda i: i[0][0])[0][0])
-    min_y = print(min(mapping.items(), key=lambda i: i[0][1])[0][1])
-    max_y = print(max(mapping.items(), key=lambda i: i[0][1])[0][1])
+    infinite_ids = set()    # to keep track of inifite points
+    points = {}             #
+    points.update(mapping)  # create independant copy
 
-    return min_x, max_x, min_y, max_y
+    for x in range(min_x, max_x + 1):
+        for y in range(min_y, max_y + 1):
+            if (x, y) in mapping:
+                pass
+            else:
+                # look for closest point
+                min_dis = man_dis((min_x, min_y), (max_x, max_y))
+                for (i, j) in points:
+                    dis = man_dis((x, y), (i, j))
+                    if dis < min_dis:
+                        min_dis = dis
+                        mapping[(x, y)] = points[(i, j)]
+                    elif dis == min_dis:
+                        mapping[(x, y)] = "."
+
+                # record edge points as infinite infinite_ids
+                if x == min_x or x == max_x or y == min_y or y == max_y:
+                    infinite_ids.add(mapping[(x, y)])
+
+    # print(mapping)
+    print("Edge points are : {}".format(sorted(infinite_ids)))
+    print([i for i in Counter(mapping.values()).most_common() if i[0] not in infinite_ids])
+    return next(i[1] for i in Counter(mapping.values()).most_common() if i[0] not in infinite_ids)
+
+
+
 """
 PART 2
 """
@@ -45,7 +78,7 @@ def solve2(input):
 Use script args to execute the right function.
 """
 if __name__ == '__main__':
-    if sys.argv[1] == '1':
+    if len(sys.argv)>1 and sys.argv[1] == '1':
         res = solve1((Input(DAY).readlines()))
         print(res)
         if len(sys.argv) == 3:
@@ -53,7 +86,7 @@ if __name__ == '__main__':
                 print("attempting to submit the response '{}' to part 1: \n\n".format(res))
                 aocd.submit1(res)
 
-    if sys.argv[1] == '2':
+    if len(sys.argv)>1 and sys.argv[1] == '2':
         res = solve2((Input(DAY).readlines()))
         print(res)
         if len(sys.argv) == 3:
