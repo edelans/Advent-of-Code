@@ -6,7 +6,7 @@ import sys
 # import itertools
 
 # day must be 2 digit
-DAY = '01'
+DAY = ''
 
 
 """
@@ -33,7 +33,7 @@ def solve2(input):
 Use script args to execute the right function.
 """
 if __name__ == '__main__':
-    if sys.argv[1] == '1':
+    if len(sys.argv)>1 and sys.argv[1] == '1':
         res = solve1((Input(DAY).readlines()))
         print(res)
         if len(sys.argv) == 3:
@@ -41,7 +41,7 @@ if __name__ == '__main__':
                 print("attempting to submit the response '{}' to part 1: \n\n".format(res))
                 aocd.submit1(res)
 
-    if sys.argv[1] == '2':
+    if len(sys.argv)>1 and sys.argv[1] == '2':
         res = solve2((Input(DAY).readlines()))
         print(res)
         if len(sys.argv) == 3:
