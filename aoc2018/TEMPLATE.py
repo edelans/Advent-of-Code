@@ -2,11 +2,13 @@
 """Template file to be used as boilerplate for each day puzzle."""
 from aoc_utilities import Input
 import aocd
+import os
 import sys
 # import itertools
 
-# day must be 2 digit
-DAY = ''
+# 2 digit day fetched from filename
+DAY = os.path.basename(__file__)[3:5]
+
 
 
 """
