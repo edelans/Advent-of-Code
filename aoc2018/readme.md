@@ -103,7 +103,7 @@ There is also a handy `.most_common(n)` method to return a list of the n most co
 
 ## lists
 
-cycle through an iterable :
+### cycle through an iterable
 
     import itertools
     input = [0, 1]
@@ -114,3 +114,17 @@ cycle through an iterable :
 index of minimum element
 
     values.index(min(values))
+
+### get max x from list of coordinates
+
+Say you have a list of `x, y` coordinates in a file :
+
+    353, 177
+    233, 332
+    178, 231
+    351, 221
+
+use `zip` to get a "transverse" list :
+
+    data = [map(int, i.split(', ')) for i in open('../input/6.in').readlines()]
+    max_x = max(zip(*data)[0])
