@@ -116,12 +116,14 @@ There is also a handy `.most_common(n)` method to return a list of the n most co
     a
     ['help', 'copyright', 'credits', 'license', 'XYZ']
 
-From [python official FAQ](https://docs.python.org/3/faq/programming.html#why-did-changing-list-y-also-change-list-x), there are 2 factores that produce this result :
+The assignment just copies the reference to the list, not the actual list, so both `a` and `b` refer to the same list after the assignment.
 
-1. Variables are simply names that refer to objects. Doing y = x doesn’t create a copy of the list – it creates a new variable y that refers to the same object x refers to. This means that there is only one object (the list), and both x and y refer to it.
+From [python official FAQ](https://docs.python.org/3/faq/programming.html#why-did-changing-list-y-also-change-list-x), there are 2 factors that produce this result :
+
+1. Variables are simply names that refer to objects. Doing `y = x` doesn’t create a copy of the list – it creates a new variable y that refers to the same object `x` refers to. This means that there is only one object (the list), and both `x` and `y` refer to it.
 2. Lists are mutable, which means that you can change their content.
 
-If we instead assign an immutable object to x:
+If we instead assign an immutable object to `x`:
 
 
     >>> x = 5  # ints are immutable
@@ -132,11 +134,19 @@ If we instead assign an immutable object to x:
     >>> y
     5
 
-we can see that in this case x and y are not equal anymore. This is because integers are immutable, and when we do x = x + 1 we are not mutating the int 5 by incrementing its value; instead, we are creating a new object (the int 6) and assigning it to x (that is, changing which object x refers to). After this assignment we have two objects (the ints 6 and 5) and two variables that refer to them (x now refers to 6 but y still refers to 5).
+we can see that in this case x and y are not equal anymore. This is because integers are immutable, and when we do `x = x + 1` we are not mutating the int `5` by incrementing its value; instead, we are creating a new object (the int `6`) and assigning it to `x` (that is, changing which object `x` refers to). After this assignment we have two objects (the ints `6` and `5`) and two variables that refer to them (`x` now refers to `6` but `y` still refers to `5`).
 
-Some operations (for example y.append(10) and y.sort()) mutate the object, whereas superficially similar operations (for example y = y + [10] and sorted(y)) create a new object. In general in Python (and in all cases in the standard library) a method that mutates an object will return None to help avoid getting the two types of operations confused. So if you mistakenly write y.sort() thinking it will give you a sorted copy of y, you’ll instead end up with None, which will likely cause your program to generate an easily diagnosed error.
+Some operations (for example `y.append(10)` and `y.sort()`) mutate the object, whereas superficially similar operations (for example `y = y + [10]` and `sorted(y)`) create a new object. In general in Python (and in all cases in the standard library) a method that mutates an object will return `None` to help avoid getting the two types of operations confused. So if you mistakenly write `y.sort()` thinking it will give you a sorted copy of `y`, you’ll instead end up with `None`, which will likely cause your program to generate an easily diagnosed error.
 
-In general, try copy.copy() or copy.deepcopy() for the general case. Not all objects can be copied, but most can.
+If the list has only 1 level, you can use the builtin `list.copy()` method (available since python 3.3):
+
+    new_list = old_list.copy()
+
+Or you can use the built in `list()` function:
+
+    new_list = list(old_list)
+
+If the list contains objects and you want to copy them as well, use generic  `copy.deepcopy()`. The slowest and most memory-needing method, but sometimes unavoidable.
 
     from copy import deepcopy
     b = deepcopy(a)
