@@ -17,7 +17,7 @@ PART1
 
 def solve1(input):
     """Solves part 1."""
-    requirements = {}  # is steps 3 requires steps 1 and 2 : {3 : [1, 2]}
+    requirements = {}  # if steps 3 requires steps 1 and 2 : {3 : [1, 2]}
     # build requirements mapping
     for line in input:
         req, st = line.split(' ')[1], line.split(' ')[7]
@@ -47,8 +47,55 @@ PART 2
 
 def solve2(input):
     """Solves part2."""
-    pass
+    requirements = {}  # if steps 3 requires steps 1 and 2 : {3 : [1, 2]}
+    # build requirements mapping
+    for line in input:
+        req, st = line.split(' ')[1], line.split(' ')[7]
+        requirements[st] = requirements.get(st, []) + [req]
+        requirements[req] = requirements.get(req, [])
+    print(requirements)
+    res = ''
 
+    # init remaining time by step
+    rem = {}
+    k = 1
+    for i in sorted(requirements.keys()):
+        rem[i] = 60 + k
+        k += 1
+
+    # keep track of workers work
+    workers = [''] * 5
+
+    s = 0
+    # iterate through each second
+    while requirements != {}:
+        for w in range(0, len(workers)):
+            if workers[w] == '':
+                # we have available workers: if there is a task requirements-free and not taken : assign worker !
+                for i in [j for j in sorted(requirements.keys()) if j not in workers]:
+                    if requirements[i] == []:
+                        workers[w] = i
+        for w in range(0, len(workers)):
+            if workers[w] != '':
+                # worker is busy, increment his work
+                rem[workers[w]] -= 1
+                if rem[workers[w]] == 0:
+                    # a step has been competed !
+                    for j in requirements:
+                        if workers[w] in requirements[j]:
+                            requirements[j].remove(workers[w])
+                    del requirements[workers[w]]
+                    res += workers[w]
+                    workers[w] = ''
+
+        s += 1
+
+    print(res)
+    return s
+
+# 1860 too high
+# 1859 too high
+# My answer is 1120
 
 """
 Use script args to execute the right function.
