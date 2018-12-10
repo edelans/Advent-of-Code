@@ -28,9 +28,11 @@ and atom linter :
 ## parsing
 
 
-A common & simple strategy is to use use `str.split()` to divide the parent string in chunks, and then `re.findall()` to output the relevant data.  `re.findall(r'-?\d+', string)` is often used to look for numbers (it outputs a list).
+A common & simple strategy is to use use `str.split()` to divide the parent string in chunks, and then `re.findall()` to output the relevant data.  `re.findall(r'-?\d+', string)` is often used to look for numbers (it outputs a list) of **strings** :
 
-Example for parsing this string :
+    lines = [[int(i) for i in re.findall(r'-?\d+', l)] for l in lines]
+
+Other example for parsing this string :
 
     # [1518-10-21 00:00] Guard #2699 begins shift
     timestamp0, comment0 = shifts[i].split('] ')
@@ -102,6 +104,43 @@ There is also a handy `.most_common(n)` method to return a list of the n most co
 
 
 ## lists
+
+### copying list to record its state
+
+
+    a=['help', 'copyright', 'credits', 'license']
+    b=a
+    b.append('XYZ')
+    b
+    ['help', 'copyright', 'credits', 'license', 'XYZ']
+    a
+    ['help', 'copyright', 'credits', 'license', 'XYZ']
+
+From [python official FAQ](https://docs.python.org/3/faq/programming.html#why-did-changing-list-y-also-change-list-x), there are 2 factores that produce this result :
+
+1. Variables are simply names that refer to objects. Doing y = x doesn’t create a copy of the list – it creates a new variable y that refers to the same object x refers to. This means that there is only one object (the list), and both x and y refer to it.
+2. Lists are mutable, which means that you can change their content.
+
+If we instead assign an immutable object to x:
+
+
+    >>> x = 5  # ints are immutable
+    >>> y = x
+    >>> x = x + 1  # 5 can't be mutated, we are creating a new object here
+    >>> x
+    6
+    >>> y
+    5
+
+we can see that in this case x and y are not equal anymore. This is because integers are immutable, and when we do x = x + 1 we are not mutating the int 5 by incrementing its value; instead, we are creating a new object (the int 6) and assigning it to x (that is, changing which object x refers to). After this assignment we have two objects (the ints 6 and 5) and two variables that refer to them (x now refers to 6 but y still refers to 5).
+
+Some operations (for example y.append(10) and y.sort()) mutate the object, whereas superficially similar operations (for example y = y + [10] and sorted(y)) create a new object. In general in Python (and in all cases in the standard library) a method that mutates an object will return None to help avoid getting the two types of operations confused. So if you mistakenly write y.sort() thinking it will give you a sorted copy of y, you’ll instead end up with None, which will likely cause your program to generate an easily diagnosed error.
+
+In general, try copy.copy() or copy.deepcopy() for the general case. Not all objects can be copied, but most can.
+
+    from copy import deepcopy
+    b = deepcopy(a)
+
 
 ### cycle through an iterable
 
