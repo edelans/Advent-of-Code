@@ -11,7 +11,6 @@ import sys
 DAY = os.path.basename(__file__)[3:5]
 
 
-
 """
 PART1
 """
@@ -36,7 +35,7 @@ def solve2(input):
 Use script args to execute the right function.
 """
 if __name__ == '__main__':
-    if len(sys.argv)>1 and sys.argv[1] == '1':
+    if len(sys.argv) > 1 and sys.argv[1] == '1':
         res = solve1((Input(DAY).readlines()))
         print(res)
         if len(sys.argv) == 3:
@@ -44,7 +43,7 @@ if __name__ == '__main__':
                 print("attempting to submit the response '{}' to part 1: \n\n".format(res))
                 aocd.submit1(res)
 
-    if len(sys.argv)>1 and sys.argv[1] == '2':
+    if len(sys.argv) > 1 and sys.argv[1] == '2':
         res = solve2((Input(DAY).readlines()))
         print(res)
         if len(sys.argv) == 3:
