@@ -115,6 +115,10 @@ index of minimum element
 
     values.index(min(values))
 
+### list comprehension + 'not in'
+
+    [x for x in t if x not in s]
+
 ### get max x from list of coordinates
 
 Say you have a list of `x, y` coordinates in a file :
