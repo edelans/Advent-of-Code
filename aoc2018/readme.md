@@ -181,3 +181,24 @@ use `zip` to get a "transverse" list :
 
     data = [map(int, i.split(', ')) for i in open('../input/6.in').readlines()]
     max_x = max(zip(*data)[0])
+
+
+## deque
+
+A "deque" is short for "double-ended queue," which Python implements internally as a doubly-linked list in C (also why it's generally faster than trying to make your own).
+
+Whenever you're moving around a circle and adding/removing items as you go, a deque is oftentimes a good fit -- especially since it can do all these things in constant time by moving pointers around. See https://wiki.python.org/moin/TimeComplexity for a nice overview over the complexities of different operations on different Python data-structures
+
+    >>> from collections import deque
+    >>> circle = deque([1,2,3,4])
+
+    >>> circle.rotate(1)
+    >>> circle
+    deque([4, 1, 2, 3])
+
+    >>> circle.pop()
+    3
+
+    >>> circle.append(5)
+    >>> circle
+    deque([4, 1, 2, 5])
