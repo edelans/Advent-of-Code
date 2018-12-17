@@ -24,7 +24,7 @@ def solve1(input):
     return sumtree([int(i) for i in input[0].split()], {'sum': 0})
 
 
-def sumtree(t, counter):
+def sumtree(t, val):
     # print("start with t: {}".format(t))
     ch = t.pop(0)
     md = t.pop(0)
@@ -40,36 +40,30 @@ def sumtree(t, counter):
     return counter['sum']
 
 
-    # return sum(sumtree(t) for _ in range(ch)) + sum(t.pop(0) for _ in range(md))
-
-
-#
-# def extract(s):
-#     children, metadata = s[:2]
-#     s = s[2:]
-#
-#     for c in range(children):
-#
-#     if children == 0:
-#         return (sum(s[:metadata]), s[metadata:])
-#
-#
-#     if s == []:
-#         return [], m
-#     if s[0] == 0:
-#         return extract(s[2+s[1]:], m + sum(s[2:2+s[1]]))
-#     else:
-#         return extract(s[2]:], m + sum(s[2:2+s[1]]))
-
-
 """
 PART 2
 """
 
 
+def valtree(t):
+    # print("start with t: {}".format(t))
+    ch = t.pop(0)
+    md = t.pop(0)
+
+    vals = [valtree(t) for _ in range(ch)]
+    mds = [t.pop(0) for _ in range(md)]
+
+    if ch == 0:
+        return sum(mds)
+
+    return sum(vals[i-1] for i in mds if i-1 in range(ch))
+
+
 def solve2(input):
     """Solves part2."""
-    pass
+    return valtree([int(i) for i in input[0].split()])
+
+
 
 
 """
