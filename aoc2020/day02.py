@@ -40,7 +40,7 @@ def solve2(input):
         min_char, max_char, letter, password = filter(None, re.split('[- :]',line)) 
         min_char = int(min_char)
         max_char = int(max_char)
-        if (password[min_char-1] == letter and  password[max_char-1] != letter) or (password[min_char-1] != letter and  password[max_char-1] == letter): 
+        if (password[min_char-1] == letter) ^ (password[max_char-1] == letter): 
             valid_password_counter +=1
     return valid_password_counter
 
