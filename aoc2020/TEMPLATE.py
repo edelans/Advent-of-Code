@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Template file to be used as boilerplate for each day puzzle."""
 from aoc_utilities import Input
-import aocd
 import os
 # import re
 import sys
@@ -38,15 +37,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == '1':
         res = solve1((Input(DAY).readlines()))
         print(res)
-        if len(sys.argv) == 3:
-            if sys.argv[2] == 's':
-                print("attempting to submit the response '{}' to part 1: \n\n".format(res))
-                aocd.submit1(res)
-
     if len(sys.argv) > 1 and sys.argv[1] == '2':
         res = solve2((Input(DAY).readlines()))
         print(res)
-        if len(sys.argv) == 3:
-            if sys.argv[2] == 's':
-                print("attempting to submit the response '{}' to part 2: \n\n".format(res))
-                aocd.submit2(res)
