@@ -41,7 +41,30 @@ Another method is to use a big regex :
     if matches:
             id = matches.group('id')
 
+Other example below : 
 
+	# this is the line to parse : 
+	# 1-3 a: abcde
+        
+	# Strategy with split() :
+        split = re.split('-|\s|: ', line)
+
+        lower    = int(split[0])
+        upper    = int(split[1])
+        key      = split[2]
+        password = split[3]
+
+	# Strategy with regex ang groups : 
+	regex = re.compile('(\d+)-(\d+)\s(\w):\s(\w+)')
+        for group in regex.findall(line):
+            lower = int(group[0])
+            upper = int(group[1])
+            letter = group[2]
+            check_me = group[3]
+
+	# or again :
+	(min, max, letter, password) = re.findall(r'([0-9]+)-([0-9]+) ([a-z]): ([a-z]+)', line.strip())[0] 
+	
 
 ## formating
 use 'str.format()'
