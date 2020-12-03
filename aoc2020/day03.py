@@ -39,10 +39,27 @@ def solve1(input):
 PART 2
 """
 
+def trees_with_slope(matrix, slope):
+    """
+    matrix is an array of lines
+    slope is (right, down) : parameters defining the slope
+    """
+    pos = (0,0)
+    trees = 0
+    while pos[1]<len(matrix):
+        line = matrix[pos[1]].strip()
+        print(line)
+        if line[pos[0]] == "#":
+            trees += 1
+        pos = ((pos[0] + slope[0]) % len(line) , pos[1] + slope[1])
+    return trees
+
+
+
 
 def solve2(input):
-    """Solves part2."""
-    pass
+    return trees_with_slope(input, (1,1)) * trees_with_slope(input, (3,1)) * trees_with_slope(input, (5,1)) * trees_with_slope(input, (7,1)) * trees_with_slope(input, (1,2)) 
+
 
 
 """
