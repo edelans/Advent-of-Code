@@ -5,6 +5,8 @@ import os
 # import re
 import sys
 # import itertools
+from functools import reduce
+
 
 # 2 digit day fetched from filename
 DAY = os.path.basename(__file__)[3:5]
@@ -58,7 +60,8 @@ def trees_with_slope(matrix, slope):
 
 
 def solve2(input):
-    return trees_with_slope(input, (1,1)) * trees_with_slope(input, (3,1)) * trees_with_slope(input, (5,1)) * trees_with_slope(input, (7,1)) * trees_with_slope(input, (1,2)) 
+    slopes = [(1,1), (3,1), (5,1), (7,1), (1,2)]
+    return reduce((lambda x, y: x * y), [trees_with_slope(input, slope) for slope in slopes]) 
 
 
 
