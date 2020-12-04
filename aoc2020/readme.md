@@ -124,6 +124,12 @@ There is also a handy `.most_common(n)` method to return a list of the n most co
 
 ## lists
 
+### slicing
+
+	>>> hgt = "176cm"
+	>>> hgt[:-2]
+	176
+
 ### copying list to record its state
 
 
