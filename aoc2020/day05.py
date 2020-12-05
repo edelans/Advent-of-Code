@@ -27,9 +27,27 @@ def solve1(lines):
     return max(compute_id(parser(line)) for line in lines)
 
 
-def solve2(input):
+def reverse_id(bid):
+    """
+    from boarding pass ID to boarding pass string
+    useless : but I thought at first that part 2 required returning the boarding pass code, not ID.
+    """
+    col = bid % 8
+    row = int((bid - col) / 8)
+    col_code = bin(col)[2:].zfill(3).replace('0', 'L').replace('1', 'R')
+    row_code = bin(row)[2:].zfill(7).replace('0', 'F').replace('1', 'B')
+    return row_code + col_code
+
+
+def solve2(lines):
     """Solves part2."""
-    pass
+    start = min(compute_id(parser(line)) for line in lines)
+    end = max(compute_id(parser(line)) for line in lines)
+    print("ids range from {} to {}".format(start, end))
+    ids = set(i for i in range(start, end + 1))
+    for line in lines:
+        ids.remove(compute_id(parser(line)))
+    return ids.pop()
 
 
 """
