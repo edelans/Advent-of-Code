@@ -12,10 +12,6 @@ DAY = os.path.basename(__file__)[3:5]
 
 
 def input_parser(input):
-    """
-    hcl:#ae17e1 iyr:2013
-    eyr:2024
-    """
     keys = ["byr","iyr","eyr","hgt","hcl","ecl","pid","cid"]
     raw_passports = input.split('\n\n')
     dict_passports = []
@@ -28,7 +24,23 @@ def input_parser(input):
                 dict_passport[k] = match.group(1)
         dict_passports.append(dict_passport)
     return dict_passports
-            
+
+"""
+some inspiration from reddit : 
+
+with open(sys.argv[1]) as f:
+        passports = [p.replace(' ', '\n') for p in f.read().split('\n\n')]
+        passports = [dict(f.split(':') for f in p.split('\n')) for p in passports]
+
+interesting 3 liner for part 1 : 
+
+passports = open('../input.txt').read().split('\n\n')
+fields = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid']
+print(sum(1 if all(f in p for f in fields) else 0 for p in passports))
+
+"""
+
+
 
 """
 PART1
@@ -41,17 +53,9 @@ def solve1(input):
     passports = input_parser(input)
     valid_passport_count = 0
     for p in passports:
-        logging.debug(p)
-        if (len(p) == 8):
-            valid_passport_count += 1
-            logging.debug("valid")
-        if (len(p) == 7 and ("cid" not in p.keys())):
-            logging.debug("valid")
+        if (len(p) == 8) or (len(p) == 7 and ("cid" not in p.keys())):
             valid_passport_count += 1
     return valid_passport_count
-
-
-
 
 
 """
@@ -77,6 +81,7 @@ def solve2(input):
             valid_p += 1
     return valid_p
 
+#in one line : return sum(validate_passport(p) for p in passports)
 
 """
 Use script args to execute the right function.

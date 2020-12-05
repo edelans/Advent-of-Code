@@ -126,6 +126,8 @@ There is also a handy `.most_common(n)` method to return a list of the n most co
 
 ### slicing
 
+How to shave the last 2 chars off a string : 
+
 	>>> hgt = "176cm"
 	>>> hgt[:-2]
 	176
@@ -203,12 +205,6 @@ Say you have a list of `x, y` coordinates in a file :
     351, 221
 
 use `zip` to get a "transverse" list :
-
-    data = [map(int, i.split(', ')) for i in open('../input/6.in').readlines()]
-    max_x = max(zip(*data)[0])
-
-
-## deque
 
 A "deque" is short for "double-ended queue," which Python implements internally as a doubly-linked list in C (also why it's generally faster than trying to make your own).
 
