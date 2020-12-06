@@ -28,7 +28,12 @@ def count_unanimous_answer(g):
     """Count unanimous answers in a group of answers"""
     chars = set(g.replace('\n', ''))
     ppl = g.splitlines()
-    return sum([1 if all([c in p for p in ppl]) for c in chars])
+    unanimous = 0
+    for c in chars:
+        if all([c in p for p in ppl]):
+            unanimous += 1
+    return unanimous
+
 
 def solve2(inp):
     """Solves part2."""
