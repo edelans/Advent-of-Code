@@ -11,20 +11,29 @@ from aoc_utilities import Input
 DAY = os.path.basename(__file__)[3:5]
 
 
-def count_uniq_char(s):
-    return len(set(s))
+def count_uniq_char(st):
+    """count uniq characters in string"""
+    return len(set(st))
 
 
 def solve1(inp):
+    """solve part 1"""
     groups = inp.split("\n\n")
     return sum([
         count_uniq_char(g.replace(' ', '').replace('\n', '')) for g in groups
     ])
 
 
+def count_unanimous_answer(g):
+    """Count unanimous answers in a group of answers"""
+    chars = set(g.replace('\n', ''))
+    ppl = g.splitlines()
+    return sum([1 if all([c in p for p in ppl]) for c in chars])
+
 def solve2(inp):
     """Solves part2."""
-    pass
+    groups = inp.split("\n\n")
+    return sum(count_unanimous_answer(g) for g in groups)
 
 
 """
