@@ -41,11 +41,11 @@ Another method is to use a big regex :
     if matches:
             id = matches.group('id')
 
-Other example below : 
+Other example below :
 
-	# this is the line to parse : 
+	# this is the line to parse :
 	# 1-3 a: abcde
-        
+
 	# Strategy with split() :
         split = re.split('-|\s|: ', line)
 
@@ -54,7 +54,7 @@ Other example below :
         key      = split[2]
         password = split[3]
 
-	# Strategy with regex ang groups : 
+	# Strategy with regex ang groups :
 	regex = re.compile('(\d+)-(\d+)\s(\w):\s(\w+)')
         for group in regex.findall(line):
             lower = int(group[0])
@@ -63,8 +63,33 @@ Other example below :
             check_me = group[3]
 
 	# or again :
-	(min, max, letter, password) = re.findall(r'([0-9]+)-([0-9]+) ([a-z]): ([a-z]+)', line.strip())[0] 
-	
+	(min, max, letter, password) = re.findall(r'([0-9]+)-([0-9]+) ([a-z]): ([a-z]+)', line.strip())[0]
+
+Note : when spliting based on multiple lines, don't `.split("\n")`, use `.splitlines()` instead. `splitlines()` will handle all different kinds of line breaks (`\r`, `\r\n`, ... ). Cf AoC2020d06.
+
+
+Ex in AoC20d06 parsing of groups of answers to a poll :  
+
+        abc
+
+        a
+        b
+        c
+
+        ab
+        ac
+
+        a
+        a
+        a
+        a
+
+        b
+
+By reading the instructions (each line is a person's answer mentioning only the questions answered yes, multiple groups of ppl) -> meaningful representation is to use a list of list of sets : a list of groups, a group is a list of ppl answers, a person answer is a set.
+
+        data = [list(map(set, group.splitlines())) for group in raw.split('\n\n')]
+
 
 ## formating
 use 'str.format()'
@@ -97,7 +122,7 @@ There is also the defaultdict from the collections module : defaultdict is a sub
     from collections import Counter, defaultdict
     d = defaultdict(list)
 
-When each key is encountered for the first time, it is not already in the mapping; so an entry is automatically created using the default_factory function (`list`) which returns an empty list.    
+When each key is encountered for the first time, it is not already in the mapping; so an entry is automatically created using the default_factory function (`list`) which returns an empty list.
 
     from collections import Counter, defaultdict
     d = defaultdict(int)
@@ -126,7 +151,7 @@ There is also a handy `.most_common(n)` method to return a list of the n most co
 
 ### slicing
 
-How to shave the last 2 chars off a string : 
+How to shave the last 2 chars off a string :
 
 	>>> hgt = "176cm"
 	>>> hgt[:-2]
@@ -223,3 +248,25 @@ Whenever you're moving around a circle and adding/removing items as you go, a de
     >>> circle.append(5)
     >>> circle
     deque([4, 1, 2, 5])
+
+
+## Reductions
+A reduction is applying the same operation to all the elements of a sequence, accumulating the result into a single variable.
+
+Examples : 
+
+        from functools import reduce
+        
+        # imagine you have a group of sets : 
+        intersected_set = reduce(set.intersection, group)
+        unionized_set = reduce(set.union, group)
+
+You can also leverage `*` to unpack iterables into a list/tuple : 
+
+        >>> group = [set("abc"), set("bcde")]
+        >>> group
+        [{'b', 'a', 'c'}, {'b', 'd', 'e', 'c'}]
+        >>> set.intersection(*group)
+        {'b', 'c'}
+        >>> set.union(*group)
+        {'b', 'e', 'a', 'd', 'c'}
