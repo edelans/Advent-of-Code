@@ -12,9 +12,16 @@ def Input(day):
     return open(filename)
 
 
+def test_input(day):
+    "Open this day's test input file"
+    filename = './input_files/input{}.test.txt'.format(day)
+    return open(filename)
+
+
 def neighbors_4(pos):
     """
     returns positions of 4 neighbors : up, down, left, right
     Be careful as these positions can be outside your map
     """
-    return [(pos[0] - 1, pos[1]), (pos[0] + 1, pos[1]), (pos[0], pos[1] - 1), (pos[0], pos[1] + 1)]
+    return [(pos[0] - 1, pos[1]), (pos[0] + 1, pos[1]), (pos[0], pos[1] - 1),
+            (pos[0], pos[1] + 1)]

@@ -3,7 +3,7 @@
 
 import os
 import sys
-from aoc_utilities import Input
+from aoc_utilities import Input, test_input
 # import re
 # import itertools
 
@@ -28,6 +28,12 @@ if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == '1':
         res = solve1((Input(DAY).readlines()))
         print(res)
+    if len(sys.argv) > 1 and sys.argv[1] == '1t':
+        res = solve1((test_input(DAY).readlines()))
+        print(res)
     if len(sys.argv) > 1 and sys.argv[1] == '2':
         res = solve2((Input(DAY).readlines()))
+        print(res)
+    if len(sys.argv) > 1 and sys.argv[1] == '2t':
+        res = solve1((test_input(DAY).readlines()))
         print(res)
