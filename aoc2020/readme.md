@@ -270,3 +270,14 @@ You can also leverage `*` to unpack iterables into a list/tuple :
         {'b', 'c'}
         >>> set.union(*group)
         {'b', 'e', 'a', 'd', 'c'}
+
+
+## Graphs
+
+Use [Networkx](https://networkx.org/documentation/stable/index.html). 
+
+NB : use a dict of dict to store a graph. 
+
+
+## Recursions
+
