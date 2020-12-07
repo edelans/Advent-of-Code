@@ -35,5 +35,5 @@ if __name__ == '__main__':
         res = solve2((Input(DAY).readlines()))
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == '2t':
-        res = solve1((test_input(DAY).readlines()))
+        res = solve2((test_input(DAY).readlines()))
         print(res)
