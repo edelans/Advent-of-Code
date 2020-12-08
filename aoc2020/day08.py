@@ -37,9 +37,46 @@ def solve1(input):
             i += 1
 
 
+def is_looping(instructions):
+    visited = set()
+    i = 0
+    acc = 0
+    while True:
+        if i in visited:
+            return True, acc
+        if i == len(instructions):
+            return False, acc
+        visited.add(i)
+        op, nb = instructions[i].split(' ')
+        if op == "acc":
+            if nb[0] == "+":
+                acc += int(nb[1:])
+            else:
+                acc -= int(nb[1:])
+            i += 1
+        elif op == "jmp":
+            if nb[0] == "+":
+                i += int(nb[1:])
+            else:
+                i -= int(nb[1:])
+        elif op == "nop":
+            i += 1
+
+
 def solve2(input):
     """Solves part2."""
-    pass
+    inst = list(input)
+    for i in range(0, len(inst)):
+        op, nb = inst[i].split(' ')
+        if op == "nop":
+            loop, acc = is_looping(inst[:i] + ["jmp " + nb] + inst[i + 1:])
+            if not loop:
+                return acc
+        if op == "jmp":
+            loop, acc = is_looping(inst[:i] + ["nop " + nb] + inst[i + 1:])
+            if not loop:
+                return acc
+    return "detection fail"
 
 
 """
