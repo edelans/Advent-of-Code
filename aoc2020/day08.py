@@ -11,9 +11,9 @@ from aoc_utilities import Input, test_input
 DAY = os.path.basename(__file__)[3:5]
 
 
-def solve1(input):
+def solve1(data):
     """Solves part 1."""
-    l = list(input)
+    instructions = list(data)
     visited = set()
     i = 0
     acc = 0
@@ -21,7 +21,7 @@ def solve1(input):
         if i in visited:
             return acc
         visited.add(i)
-        op, nb = l[i].split(' ')
+        op, nb = instructions[i].split(' ')
         if op == "acc":
             if nb[0] == "+":
                 acc += int(nb[1:])
@@ -63,9 +63,9 @@ def is_looping(instructions):
             i += 1
 
 
-def solve2(input):
+def solve2(data):
     """Solves part2."""
-    inst = list(input)
+    inst = list(data)
     for i in range(0, len(inst)):
         op, nb = inst[i].split(' ')
         if op == "nop":
