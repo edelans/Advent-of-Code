@@ -29,11 +29,22 @@ def solve1(data, size):
         k += 1
 
 
-def solve2(data):
+def solve2(data, size):
     """Solves part2."""
-    for i in data:
-        print(i)
-    pass
+    target = solve1(data, size)
+    data = [int(x) for x in data]
+    for i in range(0, len(data)):
+        dsum = 0
+        subset = []
+        for j in range(i, len(data)):
+            dsum += data[j]
+            subset.append(data[j])
+            if len(subset) == 1:
+                continue
+            if dsum > target:
+                break
+            if dsum == target:
+                return min(subset) + max(subset)
 
 
 """
@@ -47,8 +58,8 @@ if __name__ == '__main__':
         res = solve1((test_input(DAY).readlines()), 5)
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == '2':
-        res = solve2((Input(DAY).readlines()))
+        res = solve2((Input(DAY).readlines()), 25)
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == '2t':
-        res = solve2((test_input(DAY).readlines()))
+        res = solve2((test_input(DAY).readlines()), 5)
         print(res)
