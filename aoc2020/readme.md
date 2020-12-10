@@ -68,7 +68,7 @@ Other example below :
 Note : when spliting based on multiple lines, don't `.split("\n")`, use `.splitlines()` instead. `splitlines()` will handle all different kinds of line breaks (`\r`, `\r\n`, ... ). Cf AoC2020d06.
 
 
-Ex in AoC20d06 parsing of groups of answers to a poll :  
+Ex in AoC20d06 parsing of groups of answers to a poll :
 
         abc
 
@@ -231,6 +231,8 @@ Say you have a list of `x, y` coordinates in a file :
 
 use `zip` to get a "transverse" list :
 
+## deque
+
 A "deque" is short for "double-ended queue," which Python implements internally as a doubly-linked list in C (also why it's generally faster than trying to make your own).
 
 Whenever you're moving around a circle and adding/removing items as you go, a deque is oftentimes a good fit -- especially since it can do all these things in constant time by moving pointers around. See https://wiki.python.org/moin/TimeComplexity for a nice overview over the complexities of different operations on different Python data-structures
@@ -253,15 +255,15 @@ Whenever you're moving around a circle and adding/removing items as you go, a de
 ## Reductions
 A reduction is applying the same operation to all the elements of a sequence, accumulating the result into a single variable.
 
-Examples : 
+Examples :
 
         from functools import reduce
-        
-        # imagine you have a group of sets : 
+
+        # imagine you have a group of sets :
         intersected_set = reduce(set.intersection, group)
         unionized_set = reduce(set.union, group)
 
-You can also leverage `*` to unpack iterables into a list/tuple : 
+You can also leverage `*` to unpack iterables into a list/tuple :
 
         >>> group = [set("abc"), set("bcde")]
         >>> group
@@ -274,10 +276,9 @@ You can also leverage `*` to unpack iterables into a list/tuple :
 
 ## Graphs
 
-Use [Networkx](https://networkx.org/documentation/stable/index.html). 
+Use [Networkx](https://networkx.org/documentation/stable/index.html).
 
-NB : use a dict of dict to store a graph. 
+NB : use a dict of dict to store a graph.
 
 
 ## Recursions
-
