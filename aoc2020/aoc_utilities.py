@@ -25,3 +25,17 @@ def neighbors_4(pos):
     """
     return [(pos[0] - 1, pos[1]), (pos[0] + 1, pos[1]), (pos[0], pos[1] - 1),
             (pos[0], pos[1] + 1)]
+
+
+def neighbors_8(pos):
+    """
+    Returns positions of 8 neighbors : up-left, left, down-left, up, down, up-right, right, down-right
+    Be careful as these positions can be outside your map
+   
+    neighbors_8((2,2)) ->  [(1,1), (1,2), (1,3), (2,1), (2,3), (3,1), (3,2), (3,3)]
+
+    """
+    return [(pos[0] - 1, pos[1] - 1), (pos[0] - 1, pos[1]),
+            (pos[0] - 1, pos[1] + 1), (pos[0], pos[1] - 1),
+            (pos[0], pos[1] + 1), (pos[0] + 1, pos[1] - 1),
+            (pos[0] + 1, pos[1]), (pos[0] + 1, pos[1] + 1)]
