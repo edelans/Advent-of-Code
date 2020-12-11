@@ -27,8 +27,7 @@ def gprint(grid):
 def adjacent_seats_values(grid, pos):
     values = []
     for s in neighbors_8(pos):
-        if s[0] >= 0 and s[0] < len(
-                grid[0]) and s[1] >= 0 and s[1] < len(grid):
+        if 0 <= s[0] < len(grid[0]) and 0 <= s[1] < len(grid):
             # s is a valid position in the grid
             values.append(grid[s[1]][s[0]])
     return values
@@ -65,7 +64,7 @@ def solve1(data):
 
 
 def is_in_grid(s, grid):
-    return s[0] >= 0 and s[0] < len(grid[0]) and s[1] >= 0 and s[1] < len(grid)
+    return 0 <= s[0] < len(grid[0]) and 0 <= s[1] < len(grid)
 
 
 def gval(s, grid):
