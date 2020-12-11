@@ -171,9 +171,12 @@ def round2(grid):
 def solve2(data):
     """Solves part2."""
     grid = parser(data)
-    while grid != round2(grid):
-        grid = round2(grid)
-    return [val for line in grid for val in line].count("#")
+    while 1:
+        new_grid = round2(grid)
+        if new_grid == grid:
+            break
+        grid = new_grid
+    return [val for line in new_grid for val in line].count("#")
 
 
 """
