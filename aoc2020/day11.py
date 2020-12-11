@@ -64,11 +64,117 @@ def solve1(data):
     return [val for line in grid for val in line].count("#")
 
 
+def is_in_grid(s, grid):
+    return s[0] >= 0 and s[0] < len(grid[0]) and s[1] >= 0 and s[1] < len(grid)
+
+
+def gval(s, grid):
+    return grid[s[1]][s[0]]
+
+
+def adjacent_seats_values2(grid, pos):
+    """"returns the values of the first seat pos can see in each of eight directions"""
+    values = []
+
+    # up
+    s = pos
+    while is_in_grid((s[0], s[1] + 1), grid) and grid[s[1] + 1][s[0]] == ".":
+        s = (s[0], s[1] + 1)
+    adj = (s[0], s[1] + 1)
+    if is_in_grid(adj, grid):
+        values.append(gval(adj, grid))
+
+    # down
+    s = pos
+    while is_in_grid((s[0], s[1] - 1), grid) and grid[s[1] - 1][s[0]] == ".":
+        s = (s[0], s[1] - 1)
+    adj = (s[0], s[1] - 1)
+    if is_in_grid(adj, grid):
+        values.append(gval(adj, grid))
+
+    # left
+    s = pos
+    while is_in_grid((s[0] - 1, s[1]), grid) and grid[s[1]][s[0] - 1] == ".":
+        s = (s[0] - 1, s[1])
+    adj = (s[0] - 1, s[1])
+    if is_in_grid(adj, grid):
+        values.append(gval(adj, grid))
+
+    # right
+    s = pos
+    while is_in_grid((s[0] + 1, s[1]), grid) and grid[s[1]][s[0] + 1] == ".":
+        s = (s[0] + 1, s[1])
+    adj = (s[0] + 1, s[1])
+    if is_in_grid(adj, grid):
+        values.append(gval(adj, grid))
+
+    # up-left
+    s = pos
+    while is_in_grid(
+        (s[0] - 1, s[1] + 1), grid) and grid[s[1] + 1][s[0] - 1] == ".":
+        s = (s[0] - 1, s[1] + 1)
+    adj = (s[0] - 1, s[1] + 1)
+    if is_in_grid(adj, grid):
+        values.append(gval(adj, grid))
+
+    # up-right
+    s = pos
+    while is_in_grid(
+        (s[0] + 1, s[1] + 1), grid) and grid[s[1] + 1][s[0] + 1] == ".":
+        s = (s[0] + 1, s[1] + 1)
+    adj = (s[0] + 1, s[1] + 1)
+    if is_in_grid(adj, grid):
+        values.append(gval(adj, grid))
+
+    # down-left
+    s = pos
+    while is_in_grid(
+        (s[0] - 1, s[1] - 1), grid) and grid[s[1] - 1][s[0] - 1] == ".":
+        s = (s[0] - 1, s[1] - 1)
+    adj = (s[0] - 1, s[1] - 1)
+    if is_in_grid(adj, grid):
+        values.append(gval(adj, grid))
+
+    # up-right
+    s = pos
+    while is_in_grid(
+        (s[0] + 1, s[1] - 1), grid) and grid[s[1] - 1][s[0] + 1] == ".":
+        s = (s[0] + 1, s[1] - 1)
+    adj = (s[0] + 1, s[1] - 1)
+    if is_in_grid(adj, grid):
+        values.append(gval(adj, grid))
+
+    return values
+
+
+def round2(grid):
+    new_grid = []
+    for y, line in enumerate(grid):
+        new_line = []
+        for x, value in enumerate(line):
+            adj_seats_vals = adjacent_seats_values2(grid, (x, y))
+            if value == 'L':
+                if "#" not in adj_seats_vals:
+                    new_line.append("#")
+                else:
+                    new_line.append("L")
+            elif value == "#":
+                if adj_seats_vals.count("#") >= 5:
+                    new_line.append("L")
+                else:
+                    new_line.append("#")
+            elif value == ".":
+                new_line.append(".")
+        new_grid.append(new_line)
+    return new_grid
+
+
 def solve2(data):
     """Solves part2."""
-    for i in data:
-        print(i)
-    pass
+    grid = parser(data)
+    while grid != round2(grid):
+        grid = round2(grid)
+    return [val for line in grid for val in line].count("#")
 
 
 """
