@@ -5,8 +5,6 @@ import os
 import sys
 from math import e, pi
 from aoc_utilities import Input, test_input
-# import re
-# import itertools
 
 # 2 digit day fetched from filename
 DAY = os.path.basename(__file__)[3:5]
@@ -64,7 +62,6 @@ def solve2(data):
             wp *= e**(-1 * value * pi / 180 * 1j)
         elif move == "F":
             pos += value * wp
-        # print("moved with dir {} and value {}, arrived at position {}".format(move, value, pos))
     return abs(pos.imag) + abs(pos.real)
 
 
