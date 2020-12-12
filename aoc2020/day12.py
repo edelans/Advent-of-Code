@@ -44,9 +44,28 @@ def solve1(data):
 
 def solve2(data):
     """Solves part2."""
-    for i in data:
-        print(i)
-    pass
+
+    pos = complex(0, 0)
+    wp = complex(10, 1)
+
+    instructions = parser(data)
+    for move, value in instructions:
+        if move == "N":
+            wp += value * 1j
+        elif move == "S":
+            wp += value * (-1j)
+        elif move == "E":
+            wp += value * 1
+        elif move == "W":
+            wp += value * (-1)
+        elif move == "L":
+            wp *= e**(value * pi / 180 * 1j)
+        elif move == "R":
+            wp *= e**(-1 * value * pi / 180 * 1j)
+        elif move == "F":
+            pos += value * wp
+        # print("moved with dir {} and value {}, arrived at position {}".format(move, value, pos))
+    return abs(pos.imag) + abs(pos.real)
 
 
 """
