@@ -35,7 +35,7 @@ def solve1(data):
         elif move == "L":
             dir *= e**(value * pi / 180 * 1j)
         elif move == "R":
-            dir *= -e**(value * pi / 180 * 1j)
+            dir *= e**(-1 * value * pi / 180 * 1j)
         elif move == "F":
             pos += value * dir
         # print("moved with dir {} and value {}, arrived at position {}".format(move, value, pos))
