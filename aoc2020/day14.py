@@ -42,9 +42,16 @@ def solve1(data):
     return sum(mem.values())
 
 
+def xfill(xmask):
+    if "X" not in xmask:
+        return [xmask]
+    else:
+        return xfill(xmask.replace("X", "0", 1)) + xfill(
+            xmask.replace("X", "1", 1))
+
+
 def mask_addresses(addr, mask):
     """returns every possible addresses (as int) resulting from addr decoding with mask"""
-    a = []
     baddr = format(addr, "#038b")
 
     xmask = ["0b"]
@@ -56,21 +63,11 @@ def mask_addresses(addr, mask):
         else:
             xmask.append("X")
     xmask = ''.join(xmask)
-    return xfill(xmask)
+
+    return list(map(lambda a: int(a, 2), xfill(xmask)))
 
 
-print(mask_addresses("42", "000000000000000000000000000000X1001X"))
-
-
-def xfill(xmask):
-    if "X" not in xmask:
-        return xmask
-    else:
-        return xfill(xmask.replace("X", "0",
-                                   1)), xfill(xmask.replace("X", "1", 1))
-
-
-def solve2t(data):
+def solve2(data):
     """Solves part2."""
     mem = defaultdict(int)
     for line in data:
