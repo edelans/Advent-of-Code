@@ -149,6 +149,15 @@ There is also a handy `.most_common(n)` method to return a list of the n most co
 
 ## lists
 
+### list comprehension with condition
+
+    [f(x) if condition else g(x) for x in sequence]
+
+And, for list comprehensions with if conditions only : 
+
+    [f(x) for x in sequence if condition]
+
+
 ### slicing
 
 How to shave the last 2 chars off a string :
@@ -230,6 +239,21 @@ Say you have a list of `x, y` coordinates in a file :
     351, 221
 
 use `zip` to get a "transverse" list :
+
+
+## modulo 
+
+        >>> 8%5
+        3
+        >>> 8//5
+        1
+
+so : 
+
+        quotient = dividende // diviseur
+        reste = dividende % diviseur
+
+
 
 ## deque
 
