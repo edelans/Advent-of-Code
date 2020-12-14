@@ -42,11 +42,49 @@ def solve1(data):
     return sum(mem.values())
 
 
-def solve2(data):
+def mask_addresses(addr, mask):
+    """returns every possible addresses (as int) resulting from addr decoding with mask"""
+    a = []
+    baddr = format(addr, "#038b")
+
+    xmask = ["0b"]
+    for i, c in enumerate(mask):
+        if c == "0":
+            xmask.append(baddr[i + 2])
+        elif c == "1":
+            xmask.append("1")
+        else:
+            xmask.append("X")
+    xmask = ''.join(xmask)
+    return xfill(xmask)
+
+
+print(mask_addresses("42", "000000000000000000000000000000X1001X"))
+
+
+def xfill(xmask):
+    if "X" not in xmask:
+        return xmask
+    else:
+        return xfill(xmask.replace("X", "0",
+                                   1)), xfill(xmask.replace("X", "1", 1))
+
+
+def solve2t(data):
     """Solves part2."""
-    for i in data:
-        print(i)
-    pass
+    mem = defaultdict(int)
+    for line in data:
+        if line[:2] == "ma":
+            # update the mask
+            mask = line[7:].strip()
+        else:
+            addr, value = line.split(" = ")
+            value = int(value)
+            addr = int(addr[4:-1])
+
+            for a in mask_addresses(addr, mask):
+                mem[a] = value
+    return sum(mem.values())
 
 
 """
