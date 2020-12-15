@@ -4,6 +4,7 @@
 import os
 import sys
 from aoc_utilities import Input, test_input
+from collections import defaultdict
 # import re
 # import itertools
 
@@ -29,11 +30,34 @@ def solve1(data):
     return numbers[-1]
 
 
+def solve2_dumb(data):
+    """Solves part 1."""
+    numbers = [int(x) for x in data[0].strip().split(',')]
+    while len(numbers) < 30000000:
+        numbers.append(next_number(numbers))
+    return numbers[-1]
+
+
 def solve2(data):
-    """Solves part2."""
-    for i in data:
-        print(i)
-    pass
+    """Solves part 2."""
+    numbers = [int(x) for x in data[0].strip().split(',')]
+
+    # initialize
+    last_index = {}
+    last_nb = numbers[-1]
+    for i, v in enumerate(numbers[0:-1]):
+        last_index[v] = i
+
+    # build
+    for i in range(len(numbers), 30000000):
+        previous_last_nb = last_nb
+        if last_nb in last_index:
+            last_nb = i - last_index[previous_last_nb] - 1
+        else:
+            last_nb = 0
+        last_index[previous_last_nb] = i - 1
+
+    return last_nb
 
 
 """
