@@ -4,8 +4,6 @@
 import os
 import sys
 from aoc_utilities import Input, test_input
-# import re
-# import itertools
 
 # 2 digit day fetched from filename
 DAY = os.path.basename(__file__)[3:5]
@@ -18,8 +16,6 @@ def solve1(data):
 
 def solve2(data):
     """Solves part2."""
-    for i in data:
-        print(i)
     pass
 
 
