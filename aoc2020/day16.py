@@ -80,39 +80,46 @@ def solve2(data):
 
     field_columns = list(zip(*valid_tickets))
     nb_valid_tickets = len(valid_tickets)
+    identified_positions = []
 
+    # while there is a rule not yet associated with a column
     while (len(rules) > 0):
         for i, c in enumerate(field_columns):
             # c is a list of all the value we have for the same field in valid tickets
 
-            # for each rules, we count how many values for this field are valid
-            rule_valid_count = {
-                rule_name: [is_valid(n, rule_bounds) for n in c].count(True)
-                for rule_name, rule_bounds in rules.items()
-            }
-            # print(rule_valid_count)
+            if i not in identified_positions:
+                # for this col i,
+                # for each rules, we count how many values are valid
+                rule_valid_count = {
+                    rule_name:
+                    [is_valid(n, rule_bounds) for n in c].count(True)
+                    for rule_name, rule_bounds in rules.items()
+                }
+                # print(rule_valid_count)
 
-            # we list the fields whhose rules validates all valid_ticket
-            validate_all_valid_tickets = [
-                k for k, v in rule_valid_count.items() if v == nb_valid_tickets
-            ]
-            print(
-                f'rules that validate all valid tickets for field #{i} are : {validate_all_valid_tickets}'
-            )
-            if len(validate_all_valid_tickets) == 1:
-                #we can say for sure that this column is this field
-                field = validate_all_valid_tickets[0]
-                print(f'we found {field} with value {your_ticket[i]}')
+                # we list the fields whose rules validates all valid_ticket
+                validate_all_valid_tickets = [
+                    k for k, v in rule_valid_count.items()
+                    if v == nb_valid_tickets
+                ]
+                # print(
+                #    f'rules that validate all valid tickets for field #{i} are : {validate_all_valid_tickets}'
+                #)
+                if len(validate_all_valid_tickets) == 1:
+                    #we can say for sure that this column is this field
+                    field = validate_all_valid_tickets[0]
+                    # print(f'we found {field} with value {your_ticket[i]}')
 
-                # remove that field from possible fieldnames
-                del rules[field]
+                    # remove identified items for future iterations
+                    del rules[field]
+                    identified_positions.append(i)
 
-                # computation of puzzle result
-                if field.startswith("departure"):
-                    res *= your_ticket[i]
-                    print(f'dep field, res i {res}')
-                if len(rules) == 0:
-                    return res
+                    # computation of puzzle result
+                    if field.startswith("departure"):
+                        res *= your_ticket[i]
+                        # print(f'dep field, res is {res}')
+                    if len(rules) == 0:
+                        return res
 
 
 """
