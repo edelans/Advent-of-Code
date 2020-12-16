@@ -65,11 +65,8 @@ def solve2(data):
     """Solves part2."""
     res = 1
     rules, your_ticket, nearby_tickets = parser(data)
-    # print(your_ticket)
-    valid_tickets = []
-    for ticket in nearby_tickets:
-        if is_ticket_valid(ticket, rules):
-            valid_tickets.append(ticket)
+
+    valid_tickets = [t for t in nearby_tickets if is_ticket_valid(t, rules)]
 
     field_columns = list(zip(*valid_tickets))
     nb_valid_tickets = len(valid_tickets)
