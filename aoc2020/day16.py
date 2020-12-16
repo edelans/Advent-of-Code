@@ -53,9 +53,56 @@ def solve1(data):
     return res
 
 
+def is_ticket_valid(ticket, rules):
+    for n in ticket:
+        if not any([is_valid(n, rule) for rule in rules.values()]):
+            # we cannot find any rule for which this number is valid
+            return False
+    return True
+
+
+def keys_with_top_values(my_dict):
+    return [
+        key for (key, value) in my_dict.items()
+        if value == max(my_dict.values())
+    ]
+
+
 def solve2(data):
     """Solves part2."""
-    pass
+    res = 1
+    rules, your_ticket, nearby_tickets = parser(data)
+    # print(your_ticket)
+    valid_tickets = []
+    for ticket in nearby_tickets:
+        if is_ticket_valid(ticket, rules):
+            valid_tickets.append(ticket)
+    # print(valid_tickets)
+    while (len(rules) > 0):
+        field_columns = zip(*valid_tickets)
+        for i, c in enumerate(field_columns):
+            print("new cycle")
+            # c is a list of all the value we have for the same field in valid tickets
+
+            # for each rules, we count how many values for this field are valid
+            rule_valid_count = {
+                rule_name: [is_valid(n, rule_bounds) for n in c].count(True)
+                for rule_name, rule_bounds in rules.items()
+            }
+            # print(rule_valid_count)
+
+            # we suppose the field_name is the one that satisfies the most rules
+            if len(keys_with_top_values(rule_valid_count)) > 1:
+                print(f'Warning ! there is a tie on iteration {i} !!!')
+            else:
+                field = max(rule_valid_count.items(), key=lambda x: x[1])[0]
+                print(f'we found {field} with value {your_ticket[i]}')
+                del rules[field]
+                if field.startswith("departure"):
+                    res *= your_ticket[i]
+                    print(f'dep field, res i {res}')
+                if len(rules) == 0:
+                    return res
 
 
 """
