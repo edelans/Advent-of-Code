@@ -77,11 +77,12 @@ def solve2(data):
     for ticket in nearby_tickets:
         if is_ticket_valid(ticket, rules):
             valid_tickets.append(ticket)
-    # print(valid_tickets)
+
+    field_columns = list(zip(*valid_tickets))
+    nb_valid_tickets = len(valid_tickets)
+
     while (len(rules) > 0):
-        field_columns = zip(*valid_tickets)
         for i, c in enumerate(field_columns):
-            print("new cycle")
             # c is a list of all the value we have for the same field in valid tickets
 
             # for each rules, we count how many values for this field are valid
@@ -91,13 +92,22 @@ def solve2(data):
             }
             # print(rule_valid_count)
 
-            # we suppose the field_name is the one that satisfies the most rules
-            if len(keys_with_top_values(rule_valid_count)) > 1:
-                print(f'Warning ! there is a tie on iteration {i} !!!')
-            else:
-                field = max(rule_valid_count.items(), key=lambda x: x[1])[0]
+            # we list the fields whhose rules validates all valid_ticket
+            validate_all_valid_tickets = [
+                k for k, v in rule_valid_count.items() if v == nb_valid_tickets
+            ]
+            print(
+                f'rules that validate all valid tickets for field #{i} are : {validate_all_valid_tickets}'
+            )
+            if len(validate_all_valid_tickets) == 1:
+                #we can say for sure that this column is this field
+                field = validate_all_valid_tickets[0]
                 print(f'we found {field} with value {your_ticket[i]}')
+
+                # remove that field from possible fieldnames
                 del rules[field]
+
+                # computation of puzzle result
                 if field.startswith("departure"):
                     res *= your_ticket[i]
                     print(f'dep field, res i {res}')
