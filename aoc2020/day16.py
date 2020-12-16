@@ -61,13 +61,6 @@ def is_ticket_valid(ticket, rules):
     return True
 
 
-def keys_with_top_values(my_dict):
-    return [
-        key for (key, value) in my_dict.items()
-        if value == max(my_dict.values())
-    ]
-
-
 def solve2(data):
     """Solves part2."""
     res = 1
