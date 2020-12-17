@@ -69,7 +69,7 @@ def cycle(grid):
 def gprint(grid, z):
     """pretty print of the grid"""
     bounds = get_bounds(grid)
-    print(f'grid for z = {z}')
+    # print(f'grid for z = {z}')
     for y in range(bounds[1][0], bounds[1][1] + 1):
         line = []
         for x in range(bounds[0][0], bounds[0][1] + 1):
@@ -97,9 +97,80 @@ def solve1(data):
     return len(grid)
 
 
+#
+#
+#
+#
+#
+
+
+def neighbors_80(point):
+    """returns a set of (x,y,z) positions for the 26 positions around point """
+    x = [point[0] - 1, point[0], point[0] + 1]
+    y = [point[1] - 1, point[1], point[1] + 1]
+    z = [point[2] - 1, point[2], point[2] + 1]
+    w = [point[3] - 1, point[3], point[3] + 1]
+    return set(product(x, y, z, w)) - set([point])
+
+
+def parser2(data):
+    """returns a list of list of coordinates (tuples) of acitvated cubes"""
+    activated_cubes = []
+    z = 0
+    w = 0
+    for y, line in enumerate(data):
+        for x, value in enumerate(line.strip()):
+            if value == "#":
+                activated_cubes.append((x, y, z, w))
+    return activated_cubes
+
+
+def get_bounds2(grid):
+    """returns min and max index used in each dimention"""
+    xlist = [t[0] for t in grid]
+    ylist = [t[1] for t in grid]
+    zlist = [t[2] for t in grid]
+    wlist = [t[3] for t in grid]
+    return ((min(xlist), max(xlist)), (min(ylist), max(ylist)),
+            (min(zlist), max(zlist)), (min(wlist), max(wlist)))
+
+
+def cycle2(grid):
+    """returns the grid resulting of a cycle on the input grid"""
+
+    bounds = get_bounds2(grid)
+    new_grid = []
+
+    for x in range(bounds[0][0] - 1, bounds[0][1] + 2):
+        for y in range(bounds[1][0] - 1, bounds[1][1] + 2):
+            for z in range(bounds[2][0] - 1, bounds[2][1] + 2):
+                for w in range(bounds[3][0] - 1, bounds[3][1] + 2):
+                    cube = (x, y, z, w)
+                    neighbors = neighbors_80(cube)
+                    active_neighbors = []
+                    for n in neighbors:
+                        if n in grid:
+                            active_neighbors.append(n)
+                    if cube in grid and 2 <= len(active_neighbors) <= 3:
+                        #                    print(
+                        #                        f'({x}, {y}, {z}) remains active thanks to {active_neighbors}'
+                        #                    )
+                        new_grid.append(cube)
+                    if cube not in grid and len(active_neighbors) == 3:
+                        #                    print(
+                        #                        f'({x}, {y}, {z}) becomes active thanks to {active_neighbors}'
+                        #                    )
+                        new_grid.append(cube)
+    return new_grid
+
+
 def solve2(data):
     """Solves part2."""
-    pass
+    nb_cycle = 6
+    grid = parser2(data)
+    for _ in range(nb_cycle):
+        grid = cycle2(grid)
+    return len(grid)
 
 
 """
