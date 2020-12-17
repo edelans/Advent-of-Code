@@ -6,6 +6,7 @@ import sys
 
 from aoc_utilities import Input, test_input
 from itertools import product
+from operator import itemgetter
 
 # 2 digit day fetched from filename
 DAY = os.path.basename(__file__)[3:5]
@@ -116,23 +117,23 @@ def neighbors_80(point):
 def parser2(data):
     """returns a list of list of coordinates (tuples) of acitvated cubes"""
     active_cubes = set()
-    z = 0
-    w = 0
     for y, line in enumerate(data):
         for x, value in enumerate(line.strip()):
             if value == "#":
-                active_cubes.add((x, y, z, w))
+                active_cubes.add((x, y, 0, 0))
     return active_cubes
 
 
 def get_bounds2(grid):
     """returns min and max index used in each dimention"""
-    xlist = [t[0] for t in grid]
-    ylist = [t[1] for t in grid]
-    zlist = [t[2] for t in grid]
-    wlist = [t[3] for t in grid]
-    return ((min(xlist), max(xlist)), (min(ylist), max(ylist)),
-            (min(zlist), max(zlist)), (min(wlist), max(wlist)))
+    ndims = len(next(iter(grid)))
+    bounds = []
+
+    for i in range(ndims):
+        lo = min(map(itemgetter(i), grid))
+        hi = max(map(itemgetter(i), grid))
+        bounds.append((lo, hi))
+    return bounds
 
 
 def cycle2(grid):
