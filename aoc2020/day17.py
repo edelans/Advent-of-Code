@@ -115,14 +115,14 @@ def neighbors_80(point):
 
 def parser2(data):
     """returns a list of list of coordinates (tuples) of acitvated cubes"""
-    activated_cubes = []
+    active_cubes = set()
     z = 0
     w = 0
     for y, line in enumerate(data):
         for x, value in enumerate(line.strip()):
             if value == "#":
-                activated_cubes.append((x, y, z, w))
-    return activated_cubes
+                active_cubes.add((x, y, z, w))
+    return active_cubes
 
 
 def get_bounds2(grid):
@@ -139,7 +139,7 @@ def cycle2(grid):
     """returns the grid resulting of a cycle on the input grid"""
 
     bounds = get_bounds2(grid)
-    new_grid = []
+    new_grid = set()
 
     for x in range(bounds[0][0] - 1, bounds[0][1] + 2):
         for y in range(bounds[1][0] - 1, bounds[1][1] + 2):
@@ -152,15 +152,9 @@ def cycle2(grid):
                         if n in grid:
                             active_neighbors.append(n)
                     if cube in grid and 2 <= len(active_neighbors) <= 3:
-                        #                    print(
-                        #                        f'({x}, {y}, {z}) remains active thanks to {active_neighbors}'
-                        #                    )
-                        new_grid.append(cube)
+                        new_grid.add(cube)
                     if cube not in grid and len(active_neighbors) == 3:
-                        #                    print(
-                        #                        f'({x}, {y}, {z}) becomes active thanks to {active_neighbors}'
-                        #                    )
-                        new_grid.append(cube)
+                        new_grid.add(cube)
     return new_grid
 
 
