@@ -3,7 +3,6 @@
 
 import os
 import sys
-import json
 
 from aoc_utilities import Input, test_input
 from itertools import product
@@ -17,42 +16,85 @@ def neighbors_26(point):
     x = [point[0] - 1, point[0], point[0] + 1]
     y = [point[1] - 1, point[1], point[1] + 1]
     z = [point[2] - 1, point[2], point[2] + 1]
-    return set(product(x, y, z)) - set(point)
+    return set(product(x, y, z)) - set([point])
 
 
 def parser(data):
-    """returns a 3 dimentional grid as a dict"""
-    grid = {}
+    """returns a list of list of coordinates (tuples) of acitvated cubes"""
+    activated_cubes = []
     z = 0
     for y, line in enumerate(data):
         for x, value in enumerate(line.strip()):
             if value == "#":
-                print(
-                    f'grid is {grid}, x is {x}, y is {y} and value is {value}')
-                grid[x] = grid.get(x, {})
-                grid[x][y] = grid[x].get(y, {})
-                grid[x][y][z] = "#"
-    print(json.dumps(grid, indent=4))
-    return grid
+                activated_cubes.append((x, y, z))
+    return activated_cubes
 
 
-def bounds(grid):
+def get_bounds(grid):
     """returns min and max index used in each dimention"""
-    xlist = grid.keys()
-    ylist = set()
-    for v in grid.values():
-        ylist.update(set(v.keys()))
-    zlist = set()
-    for v in grid.values():
-        for v2 in v.values():
-            zlist.update(set(v2.keys()))
+    xlist = [t[0] for t in grid]
+    ylist = [t[1] for t in grid]
+    zlist = [t[2] for t in grid]
     return ((min(xlist), max(xlist)), (min(ylist), max(ylist)), (min(zlist),
                                                                  max(zlist)))
 
 
+def cycle(grid):
+    """returns the grid resulting of a cycle on the input grid"""
+
+    bounds = get_bounds(grid)
+    new_grid = []
+
+    for x in range(bounds[0][0] - 1, bounds[0][1] + 2):
+        for y in range(bounds[1][0] - 1, bounds[1][1] + 2):
+            for z in range(bounds[2][0] - 1, bounds[2][1] + 2):
+                neighbors = neighbors_26((x, y, z))
+                active_neighbors = []
+                for n in neighbors:
+                    if n in grid:
+                        active_neighbors.append(n)
+                if (x, y, z) in grid and 2 <= len(active_neighbors) <= 3:
+                    #                    print(
+                    #                        f'({x}, {y}, {z}) remains active thanks to {active_neighbors}'
+                    #                    )
+                    new_grid.append((x, y, z))
+                if (x, y, z) not in grid and len(active_neighbors) == 3:
+                    #                    print(
+                    #                        f'({x}, {y}, {z}) becomes active thanks to {active_neighbors}'
+                    #                    )
+                    new_grid.append((x, y, z))
+    return new_grid
+
+
+def gprint(grid, z):
+    """pretty print of the grid"""
+    bounds = get_bounds(grid)
+    print(f'grid for z = {z}')
+    for y in range(bounds[1][0], bounds[1][1] + 1):
+        line = []
+        for x in range(bounds[0][0], bounds[0][1] + 1):
+            if (x, y, z) in grid:
+                line.append("#")
+            else:
+                line.append(".")
+        print(''.join(line))
+    return
+
+
 def solve1(data):
     """Solves part 1."""
-    return bounds(parser(data))
+    nb_cycle = 6
+    grid = parser(data)
+    for _ in range(nb_cycle):
+        grid = cycle(grid)
+
+    # print(grid)
+    # bounds = get_bounds(grid)
+    # for z in range(bounds[2][0], bounds[2][1] + 1):
+    #     gprint(grid, z)
+    #     print()
+
+    return len(grid)
 
 
 def solve2(data):
