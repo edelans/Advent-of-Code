@@ -10,6 +10,8 @@ from aoc_utilities import Input, test_input
 # 2 digit day fetched from filename
 DAY = os.path.basename(__file__)[3:5]
 
+# pattern = r"\([^()]*\)" would have been a simpler choice to match pairs of parentheses that do not contain any parentheses
+
 
 def eval_line(line):
     # resolve parentheses first
