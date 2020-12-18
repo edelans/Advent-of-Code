@@ -13,9 +13,10 @@ DAY = os.path.basename(__file__)[3:5]
 
 def eval_line(line):
     # resolve parentheses first
-    m = re.search(r"\(\d+\s[+*]\s\d+\)", line)
+    m = re.search(r"\((\d+(\s[+*]\s\d+)+)\)", line)
     if m:
-        return eval_line(line.replace(m.group(0), str(eval(m.group(0))), 1))
+        inner_parenthesis = eval_line(m.group(1))
+        return eval_line(line.replace(m.group(0), str(inner_parenthesis), 1))
 
     # then eval the first operation on the left
     m2 = re.search(r"\d+\s[+*]\s\d+", line)
