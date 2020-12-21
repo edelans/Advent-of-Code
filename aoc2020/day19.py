@@ -39,6 +39,7 @@ def get_regex_validation(rule, rules_dict):
 
 def get_regex_validation2(rule, rules_dict):
     # print(rule)
+    # clean it like https://topaz.github.io/paste/#XQAAAQDzAgAAAAAAAAA0m0pnuFI8c/T1e9t0PMBti2mEcdYipHZYhCofRqVaOlj+UK7uG+kSryqDPRjN/l8dPcN5sLCzGZ2IRrIEpKPX8OHlryZm3WWNmcUuUvO5MG27hmtq8X4zRbvBtpEPKlMHFdtcTZIVFZVH/mcOHgz6cVQKD66YwKkfwHR5hMI8Xf9Q3Disai0qcjSa0hpmav4AmbNIa+zTHJy4YiimtZjV/FwJUhFByU8SuzHT3gp/F+QgIxwnLTHAkHbccyfEPjbX8y2XFx55gfiBuANOAypGeam+kvuAqUogjqySAHrbjun5HOHKHqyFpKtSkuOOMb2YitItlNVGFZ/5vD7Agq16CGS3wHAzEJJ0BsJ4r4atTu6e3o2subbpcVXvC/p+VY6sPezNGc/l0qb5sWUjkGbc3Go3AVqKHR25B9Jc1mhYn8iQjYZbyrqsaceoTwF+bMYQEAomMDZHgHPXzhHNEwF2aRg4iULmnKHgsrtZikwjn6NIz8ogidDYtVBHsRqQpTx1BUsqGVvDFFyP7EUPLVqAqseM9/aHQyno5uy58LL/1K+v4w==
     if not rule[0].isdigit():
         return rule[0]
     elif "|" in rule:
