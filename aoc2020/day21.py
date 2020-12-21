@@ -59,12 +59,18 @@ def solve1(data):
             if ing in line[0]:
                 count += 1
 
-    return count
+    # for part 2
+    l = ','.join([
+        str(v.pop())
+        for k, v in sorted(allergens.items(), key=lambda item: item[0])
+    ])
+
+    return count, l
 
 
 def solve2(data):
     """Solves part2."""
-    pass
+    return solve1(data)[1]
 
 
 """
