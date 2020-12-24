@@ -21,16 +21,16 @@ dz = {
 
 def line_parser(line):
     """parse a line of moves, returns a list of directions"""
-    lline = [x for x in line]
-    l = []
+    lline = list(line)
+    directions = []
     while lline:
-        el = lline.pop(0)
-        if el == "e" or el == "w":
-            l.append(el)
-        elif el == "s" or el == "n":
-            el2 = lline.pop(0)
-            l.append(''.join((el, el2)))
-    return l
+        elem = lline.pop(0)
+        if elem in ("e", "w"):
+            directions.append(elem)
+        elif elem in ("s", "n"):
+            elem2 = lline.pop(0)
+            directions.append(''.join((elem, elem2)))
+    return directions
 
 
 def build_grid(data):
@@ -39,10 +39,10 @@ def build_grid(data):
     blacks = []
     for line in data:
         line = line_parser(line)
-        z = complex(0, 0)
-        for dir in line:
-            z += dz[dir]
-        blacks.remove(z) if z in blacks else blacks.append(z)
+        tile = complex(0, 0)
+        for direction in line:
+            tile += dz[direction]
+        blacks.remove(tile) if tile in blacks else blacks.append(tile)
     return blacks
 
 
@@ -51,12 +51,13 @@ def solve1(data):
     return len(build_grid(data))
 
 
-def neighbors(z):
-    """return a list of the positions of the 6 hexagons (as complexe numbers) adjacent to the cell in input"""
-    neighbors = []
-    for v in dz.values():
-        neighbors.append(z + v)
-    return neighbors
+def neighbors(tile):
+    """return a list of the positions of the 6 hexagons (as complexe numbers)
+    adjacent to the cell in input"""
+    neighbor = []
+    for vector in dz.values():
+        neighbor.append(tile + vector)
+    return neighbor
 
 
 def evolve(grid):
@@ -76,7 +77,7 @@ def evolve(grid):
                         count2 += 1
                 if count2 == 2:
                     new_grid.add(n)
-        if count == 1 or count == 2:
+        if count in (1, 2):
             new_grid.add(black)
     return new_grid
 
