@@ -3,7 +3,7 @@
 Just having fun sovling [advent of code](https://adventofcode.com/) puzzles one more year =)
 
 
-# how to use
+l::l# how to use
 
 virtual env :
 
@@ -153,7 +153,7 @@ There is also a handy `.most_common(n)` method to return a list of the n most co
 
     [f(x) if condition else g(x) for x in sequence]
 
-And, for list comprehensions with if conditions only : 
+And, for list comprehensions with if conditions only :
 
     [f(x) for x in sequence if condition]
 
@@ -241,14 +241,14 @@ Say you have a list of `x, y` coordinates in a file :
 use `zip` to get a "transverse" list :
 
 
-## modulo 
+## modulo
 
         >>> 8%5
         3
         >>> 8//5
         1
 
-so : 
+so :
 
         quotient = dividende // diviseur
         reste = dividende % diviseur
@@ -274,6 +274,14 @@ Whenever you're moving around a circle and adding/removing items as you go, a de
     >>> circle.append(5)
     >>> circle
     deque([4, 1, 2, 5])
+
+## Linked lists
+
+Inserting/removing elements in a list is O(n), while time complexity for those operations on LinkedLists is always constant: O(1).
+
+So use them when the problem involves a lot of insertions / deletions in a list (see aoc2020/day23/part2).
+
+Sometimes just using a dict (without implementing a proper LinkedList) is enough.
 
 
 ## Reductions
@@ -306,3 +314,7 @@ NB : use a dict of dict to store a graph.
 
 
 ## Recursions
+
+@cache decorator can be very handy when the recursions goes over the same cases again and again.
+
+TODO : learn more about the different recursion cases. (tail recursion, tree recursion...).
