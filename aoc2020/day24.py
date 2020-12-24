@@ -22,8 +22,7 @@ def line_parser(line):
     return l
 
 
-def solve1(data):
-    """Solves part 1."""
+def build_grid(data):
     data = data.splitlines()
 
     blacks = []
@@ -47,12 +46,50 @@ def solve1(data):
             blacks.remove(z)
         else:
             blacks.append(z)
-    return len(blacks)
+    return blacks
+
+
+def solve1(data):
+    return len(build_grid(data))
+
+
+def neighbors(z):
+    """return the 6 hexagons (as complexe numbers) adjacent to the cell in input"""
+    deltas = [(2, 0), (1, -1), (-1, -1), (-2, 0), (-1, 1), (1, 1)]
+    neighbors = []
+    for (dr, di) in deltas:
+        neighbors.append(complex(z.real + dr, z.imag + di))
+    return neighbors
+
+
+def evolve(grid):
+    new_grid = set()
+    for black in grid:
+        count = 0
+        for n in neighbors(black):
+            if n in grid:
+                count += 1
+            else:
+                # n is a white tile that has at least 1 black neighbor, let's count them all :
+                count2 = 0
+                for n2 in neighbors(n):
+                    if n2 in grid:
+                        count2 += 1
+                if count2 == 2:
+                    new_grid.add(n)
+        if count == 1 or count == 2:
+            new_grid.add(black)
+    return new_grid
 
 
 def solve2(data):
     """Solves part2."""
-    pass
+    grid = build_grid(data)
+
+    for _ in range(100):
+        grid = evolve(grid)
+
+    return len(grid)
 
 
 """
