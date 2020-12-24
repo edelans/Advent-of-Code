@@ -10,6 +10,7 @@ DAY = os.path.basename(__file__)[3:5]
 
 
 def line_parser(line):
+    """parse a line of moves, returns a list of directions"""
     lline = [x for x in line]
     l = []
     while lline:
@@ -23,38 +24,34 @@ def line_parser(line):
 
 
 def build_grid(data):
+    """return a list of black tiles positions (as complex numbers)"""
     data = data.splitlines()
-
+    deltas = {
+        "e": (2, 0),
+        "se": (1, -1),
+        "sw": (-1, -1),
+        "w": (-2, 0),
+        "nw": (-1, 1),
+        "ne": (1, 1)
+    }
     blacks = []
     for line in data:
         line = line_parser(line)
         z = complex(0, 0)
         for dir in line:
-            if dir == "e":
-                z += 2
-            elif dir == "se":
-                z += 1 - 1j
-            elif dir == "sw":
-                z += -1 - 1j
-            elif dir == "w":
-                z += -2
-            elif dir == "nw":
-                z += -1 + 1j
-            elif dir == "ne":
-                z += 1 + 1j
-        if z in blacks:
-            blacks.remove(z)
-        else:
-            blacks.append(z)
+            dr, di = deltas[dir]
+            z = z.real + dr + (z.imag + di) * 1j
+        blacks.remove(z) if z in blacks else blacks.append(z)
     return blacks
 
 
 def solve1(data):
+    """solves part1"""
     return len(build_grid(data))
 
 
 def neighbors(z):
-    """return the 6 hexagons (as complexe numbers) adjacent to the cell in input"""
+    """return a list of the positions of the 6 hexagons (as complexe numbers) adjacent to the cell in input"""
     deltas = [(2, 0), (1, -1), (-1, -1), (-2, 0), (-1, 1), (1, 1)]
     neighbors = []
     for (dr, di) in deltas:
@@ -63,6 +60,8 @@ def neighbors(z):
 
 
 def evolve(grid):
+    """takes the list of black tiles position on one day
+    returns the list of black tiles position the day after"""
     new_grid = set()
     for black in grid:
         count = 0
