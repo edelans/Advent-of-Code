@@ -8,6 +8,16 @@ from aoc_utilities import Input, test_input
 # 2 digit day fetched from filename
 DAY = os.path.basename(__file__)[3:5]
 
+# global variable for translating directions in complexe vectors
+dz = {
+    "e": 2 + 0j,
+    "se": 1 - 1j,
+    "sw": -1 - 1j,
+    "w": -2 + 0j,
+    "nw": -1 + 1j,
+    "ne": 1 + 1j
+}
+
 
 def line_parser(line):
     """parse a line of moves, returns a list of directions"""
@@ -26,21 +36,12 @@ def line_parser(line):
 def build_grid(data):
     """return a list of black tiles positions (as complex numbers)"""
     data = data.splitlines()
-    deltas = {
-        "e": (2, 0),
-        "se": (1, -1),
-        "sw": (-1, -1),
-        "w": (-2, 0),
-        "nw": (-1, 1),
-        "ne": (1, 1)
-    }
     blacks = []
     for line in data:
         line = line_parser(line)
         z = complex(0, 0)
         for dir in line:
-            dr, di = deltas[dir]
-            z = z.real + dr + (z.imag + di) * 1j
+            z += dz[dir]
         blacks.remove(z) if z in blacks else blacks.append(z)
     return blacks
 
@@ -52,10 +53,9 @@ def solve1(data):
 
 def neighbors(z):
     """return a list of the positions of the 6 hexagons (as complexe numbers) adjacent to the cell in input"""
-    deltas = [(2, 0), (1, -1), (-1, -1), (-2, 0), (-1, 1), (1, 1)]
     neighbors = []
-    for (dr, di) in deltas:
-        neighbors.append(complex(z.real + dr, z.imag + di))
+    for v in dz.values():
+        neighbors.append(z + v)
     return neighbors
 
 
