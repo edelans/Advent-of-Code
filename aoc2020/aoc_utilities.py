@@ -1,4 +1,5 @@
 import re
+from itertools import product 
 
 
 def parse_words(text):
@@ -18,6 +19,27 @@ def test_input(day):
     return open(filename)
 
 
+def get_neighbors(point):
+    """returns a set of all the neighboring positions of the input point
+    whatever the number of dimentions
+
+    Examples : 
+    >>> import aoc_utilities
+    >>> aoc_utilities.get_neighbors((0,0))
+    {(0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, 0), (1, -1), (1, 1)}
+    >>> aoc_utilities.get_neighbors((0,0,0))
+    {(0, 1, 1), (1, -1, -1), (1, 0, 0), (-1, 0, -1), (0, 0, 1), (0, -1, 1), (1, 0, 1), (-1, -1, -1), (-1, 1, -1), (0, -1, 0), (1, 1, 1), (-1, 1, 0), (1, 1, 0), (1, 1, -1), (-1, 1, 1), (-1, -1, 1), (1, -1, 0), (0, -1, -1), (-1, -1, 0), (0, 0, -1), (-1, 0, 1), (1, 0, -1), (1, -1, 1), (-1, 0, 0), (0, 1, 0), (0, 1, -1)}
+    >>> len(aoc_utilities.get_neighbors((0,0)))
+    8
+    >>> len(aoc_utilities.get_neighbors((0,0,0)))
+    26
+    >>> len(aoc_utilities.get_neighbors((0,0,0,0)))
+    80"""
+
+    ranges = ((c - 1, c, c + 1) for c in point)
+    return (set(product(*ranges)) - set([point]))
+
+
 def neighbors_4(pos):
     """
     returns positions of 4 neighbors : up, down, left, right
@@ -25,17 +47,3 @@ def neighbors_4(pos):
     """
     return [(pos[0] - 1, pos[1]), (pos[0] + 1, pos[1]), (pos[0], pos[1] - 1),
             (pos[0], pos[1] + 1)]
-
-
-def neighbors_8(pos):
-    """
-    Returns positions of 8 neighbors : up-left, left, down-left, up, down, up-right, right, down-right
-    Be careful as these positions can be outside your map
-   
-    neighbors_8((2,2)) ->  [(1,1), (1,2), (1,3), (2,1), (2,3), (3,1), (3,2), (3,3)]
-
-    """
-    return [(pos[0] - 1, pos[1] - 1), (pos[0] - 1, pos[1]),
-            (pos[0] - 1, pos[1] + 1), (pos[0], pos[1] - 1),
-            (pos[0], pos[1] + 1), (pos[0] + 1, pos[1] - 1),
-            (pos[0] + 1, pos[1]), (pos[0] + 1, pos[1] + 1)]

@@ -24,14 +24,14 @@ Use script args to execute the right function.
 """
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == '1':
-        res = solve1((Input(DAY).readlines()))
+        res = solve1((Input(DAY).read()))
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == '1t':
-        res = solve1((test_input(DAY).readlines()))
+        res = solve1((test_input(DAY).read()))
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == '2':
-        res = solve2((Input(DAY).readlines()))
+        res = solve2((Input(DAY).read()))
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == '2t':
-        res = solve2((test_input(DAY).readlines()))
+        res = solve2((test_input(DAY).read()))
         print(res)
