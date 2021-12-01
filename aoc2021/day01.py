@@ -21,7 +21,12 @@ def solve1(data):
 
 def solve2(data):
     """Solves part2."""
-    pass
+    increasing_sum = 0
+    depths = [int(line) for line in data.splitlines()]
+    for i in range(1, len(depths)):
+        if depths[i-3] + depths[i-2] + + depths[i-1] < depths[i-2] + depths[i-1] + depths[i]:
+            increasing_sum += 1
+    return increasing_sum
 
 
 """
