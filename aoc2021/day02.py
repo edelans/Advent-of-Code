@@ -24,8 +24,17 @@ def solve1(data):
 
 
 def solve2(data):
-    """Solves part2."""
-    pass
+    instructions = [(x.split(" ")) for x in data.splitlines()]
+    hpos, vpos, aim = (0,0,0)
+    for inst in instructions:
+        if inst[0] == "forward":
+            hpos += int(inst[1])
+            vpos += aim * int(inst[1])
+        elif inst[0] == "up":
+            aim -= int(inst[1])
+        elif inst[0] == "down":
+            aim += int(inst[1])
+    return hpos * vpos
 
 
 """
