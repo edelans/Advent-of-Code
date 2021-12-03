@@ -11,7 +11,7 @@ Get to know pycharm.
 
 ## Pycharm
 
-- Navigate/select occurences : 
+- Navigate/select occurrences : 
   - command+G = go to next occurrence
   - command+ctrl+g = go to previous 
   - and ctrl+G = select next occurrence
