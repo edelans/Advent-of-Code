@@ -4,7 +4,7 @@ Just having fun sovling [advent of code](https://adventofcode.com/) puzzles one 
 
 # Goal of this year
 
-Get to know pycharm. 
+Get to know Pycharm. 
 
 # Repos to watch for instpiration
 
