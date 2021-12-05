@@ -3,7 +3,7 @@
 Just having fun sovling [advent of code](https://adventofcode.com/) puzzles one more year =)
 
 
-l::l# how to use
+# how to use
 
 virtual env :
 
