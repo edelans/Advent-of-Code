@@ -36,32 +36,6 @@ def parser1(data):
     return horizontals, verticals
 
 
-def parser1(data):
-    """
-    takes in input
-
-    0,9 -> 5,9
-    8,0 -> 0,8
-    ...
-
-    returns a list of tuple of tuples : [ ((0,9),(5,9)), ((8,0),(0,8)), ...   ]
-    """
-    horizontals = []
-    verticals = []
-
-    lines = data.splitlines()
-    for line in lines:
-        x1,y1,x2,y2 = [int(x) for x in re.findall(r'\d+', line)]
-        if (x1 == x2):
-            verticals.append(((x1,y1),(x2,y2))) if y1<=y2 else verticals.append(((x2,y2),(x1,y1)))
-        if (y1 == y2):
-            horizontals.append(((x1, y1), (x2, y2))) if x1<=x2 else horizontals.append(((x2, y2), (x1, y1)))
-
-    print(f"{len(horizontals)} horizontals are {horizontals}")
-    print(f"{len(verticals)} verticals are {verticals}")
-
-    return horizontals, verticals
-
 def solve1(data):
     """Solves part 1."""
     horizontals, verticals = parser1(data)
@@ -78,7 +52,6 @@ def solve1(data):
     return sum([1 for x in vents if vents[x]>=2])
 
 
-
 def parser2(data):
     """
     takes in input
@@ -88,6 +61,7 @@ def parser2(data):
     ...
 
     returns a list of tuple of tuples : [ ((0,9),(5,9)), ((8,0),(0,8)), ...   ]
+    including diagonals
     """
     horizontals = []
     verticals = []
