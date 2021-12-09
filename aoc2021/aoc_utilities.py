@@ -19,7 +19,7 @@ def test_input(day):
     return open(filename)
 
 
-def get_neighbors(point):
+def neighbors_all(point):
     """returns a set of all the neighboring positions of the input point
     whatever the number of dimentions
 
