@@ -15,14 +15,12 @@ DAY = os.path.basename(__file__)[3:5]
 
 def solve1(data):
     """Solves part 1."""
-
     SCORES = {
         ')': 3,
         ']': 57,
         '}': 1197,
         '>': 25137
     }
-
     total = 0
 
     for line in data.splitlines():
@@ -42,10 +40,7 @@ def solve1(data):
                 if c != expected_closing:
                     print(f"Expected {expected_closing}, but found {c} instead")
                     total += SCORES[c]
-
     return total
-
-
 
 
 def solve2(data):
@@ -74,7 +69,6 @@ def solve2(data):
                 stack.append('}')
 
             elif c in ')>}]':
-
                 expected_closing = stack.pop()
                 if c != expected_closing:
                     # corrupted line
