@@ -25,15 +25,15 @@ def neighbors_all(point):
 
     Examples : 
     >>> import aoc_utilities
-    >>> aoc_utilities.get_neighbors((0,0))
+    >>> aoc_utilities.neighbors_all((0,0))
     {(0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, 0), (1, -1), (1, 1)}
-    >>> aoc_utilities.get_neighbors((0,0,0))
+    >>> aoc_utilities.neighbors_all((0,0,0))
     {(0, 1, 1), (1, -1, -1), (1, 0, 0), (-1, 0, -1), (0, 0, 1), (0, -1, 1), (1, 0, 1), (-1, -1, -1), (-1, 1, -1), (0, -1, 0), (1, 1, 1), (-1, 1, 0), (1, 1, 0), (1, 1, -1), (-1, 1, 1), (-1, -1, 1), (1, -1, 0), (0, -1, -1), (-1, -1, 0), (0, 0, -1), (-1, 0, 1), (1, 0, -1), (1, -1, 1), (-1, 0, 0), (0, 1, 0), (0, 1, -1)}
-    >>> len(aoc_utilities.get_neighbors((0,0)))
+    >>> len(aoc_utilities.neighbors_all((0,0)))
     8
-    >>> len(aoc_utilities.get_neighbors((0,0,0)))
+    >>> len(aoc_utilities.neighbors_all((0,0,0)))
     26
-    >>> len(aoc_utilities.get_neighbors((0,0,0,0)))
+    >>> len(aoc_utilities.neighbors_all((0,0,0,0)))
     80"""
 
     ranges = ((c - 1, c, c + 1) for c in point)
