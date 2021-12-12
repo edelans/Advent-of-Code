@@ -35,53 +35,74 @@ def solve1(data):
     return uniq_digit
 
 
-def decipher(signal_pattern, four_digit_output):
-    segments = {}
-    segments['one'] = set([x for x in signal_pattern if len(x) == 2])
-    segments['four'] = set([x for x in signal_pattern if len(x) == 4])
-    segments['seven'] = set([x for x in signal_pattern if len(x) == 3])
-    segments['eight'] = set([x for x in signal_pattern if len(x) == 7])
+def get_pattern_to_digit_mapping(signal_pattern):
 
+    # pattern to digit mapper: digit[pattern] yields the digit
+    digit = {}
 
-    segments['two'] = set([x for x in signal_pattern if len(x) == 5])
-    segments['three'] = set([x for x in signal_pattern if len(x) == 5])
-    segments['five'] = set([x for x in signal_pattern if len(x) == 5])
+    # get all easy mappings
+    for p in signal_pattern:
+        if len(p) == 2:
+            digit[p] = 1
+        elif len(p) == 4:
+            digit[p] = 4
+        elif len(p) == 3:
+            digit[p] = 7
+        elif len(p) == 7:
+            digit[p] = 8
 
-    segments['six'] = set([x for x in signal_pattern if len(x) == 6])
-    segments['zero'] = set([x for x in signal_pattern if len(x) == 6])
-    segments['nine'] = set([x for x in signal_pattern if len(x) == 6])
+    # digit to pattern mapper: pattern[digit] yields the pattern
+    pattern = {v: k for k,v in digit.items()}
 
-    signal_line = {}
-    signal_line["top"] = set(segments['seven'][0]) - set(segments['one'][0])
-    signal_line["bottom"] = set(segments['six'][0]).intersection(set(segments['six'][1]), set(segments['six'][2])) - set(segments['seven'][0]) - set(segments['four'][0])
+    # second run where we are sure to have mapped all easy patterns
+    for p in signal_pattern:
+        if len(p) == 5:
+            # 2, 3 or 5
 
-    # trouver le 9 en faisant 4 + top + bottom
-    # trouver le 0 c'est celui à 6 char qui n'a qu'une linge de différence avec 9
-    # en déduire le 6 (le seul restant non identifié des 6 char)
+            # 3 is the only one to "include" the 1
+            if set(pattern[1]).issubset(set(p)):
+                digit[p] = 3
 
-    # en déduire middle (9 - 0)
-    # en déduire bottom left (0 - 9)
-    # en déduire le 2
-    # en déduire le 3 : le seul qui a 1 de diff avec le 2
-    # en déduire le 5
+            # 5 and 4 have 3 common segments, while 2 and 4 have only 2
+            elif len(set(p) & set(pattern[4])) == 3:
+                digit[p] = 5
+            else:
+                digit[p] = 2
 
+        if len(p) == 6:
+            # 0, 6 or 9
 
-    signal_line["top_right"] = set(segments['one'][0])
-    signal_line["top_left"] =
-    signal_line["middle"] =
-    signal_line["bottom_right"] = set(segments['one'][0])
-    signal_line["bottom_left"] =
+            # 6 is the only one to not include the segments of 1
+            if not set(pattern[1]).issubset(set(p)):
+                digit[p] = 6
 
+            # 9 is the only one to include the segments of 4
+            elif set(pattern[4]).issubset(set(p)):
+                digit[p] = 9
 
+            else:
+                digit[p] = 0
 
-    print(segments["nine"])
+    return digit
 
 
 
 def solve2(data):
     """Solves part2."""
     signal_patterns, four_digits_output_values = parser(data)
-    decipher(signal_patterns[0], four_digits_output_values[0])
+    total = 0
+
+    for index, signal_pattern in enumerate(signal_patterns):
+        pattern_to_digit = get_pattern_to_digit_mapping(signal_pattern)
+        output_value = pattern_to_digit[four_digits_output_values[index][0]] * 1000 \
+                        + pattern_to_digit[four_digits_output_values[index][1]] * 100 \
+                        + pattern_to_digit[four_digits_output_values[index][2]] * 10 \
+                        + pattern_to_digit[four_digits_output_values[index][3]] * 1
+        print(f"output value is {output_value}")
+        total += output_value
+
+    return total
+
 
 """
 Use script args to execute the right function.

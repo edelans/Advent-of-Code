@@ -39,7 +39,8 @@ def solve1(data):
                 np = p + [neighbor]
                 investigating_paths.append(np)
 
-    return print(f"there are {len(complete_paths)} possible paths")
+    print(f"there are {len(complete_paths)} possible paths")
+    return
 
 
 def isALowerValueAlreadyPresentTwice(path):
@@ -50,7 +51,12 @@ def isALowerValueAlreadyPresentTwice(path):
     return False
 
 def solve2(data):
-    """Solves part2."""
+    """Solves part2.
+    this is super slow, but hey, it works
+    improvement ideas :
+    - don't store all the paths, it just clutter the RAM + adds a lot of operations,
+    - use a deque instead of a list
+    """
     G = parser(data)
     complete_paths = []
     investigating_paths = [["start"]]
