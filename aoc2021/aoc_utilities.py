@@ -47,3 +47,16 @@ def neighbors_4(pos):
     """
     return [(pos[0] - 1, pos[1]), (pos[0] + 1, pos[1]), (pos[0], pos[1] - 1),
             (pos[0], pos[1] + 1)]
+
+
+def mprint(maping):
+    """
+    Helper function to print the map
+    when the map is a dictionary, with keys as tuples of coordinates (1,2)
+    no need to have all the coordinates in the keys
+    """
+    xmax = max([int(i) for (i,j) in maping.keys()])
+    ymax = max([int(j) for (i,j) in maping.keys()])
+    for y in range(ymax + 1):
+        print(''.join([str(maping.get((x,y),".")) for x in range(xmax + 1)]))
+    return
