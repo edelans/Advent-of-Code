@@ -4,6 +4,7 @@
 import os
 import sys
 from aoc_utilities import Input, test_input
+from collections import deque
 
 # 2 digit day fetched from filename
 DAY = os.path.basename(__file__)[3:5]
@@ -21,11 +22,15 @@ def parser(data):
 
 
 def mprint(maping):
+    """
+    Helper function to print the map
+    """
     xmax = max([int(i) for (i,j) in maping.keys()])
     ymax = max([int(j) for (i,j) in maping.keys()])
     for y in range(ymax + 1):
         print(''.join([str(maping.get((x,y),".")) for x in range(xmax + 1)]))
     return
+
 
 def solve1(data):
     """Solves part 1."""
@@ -88,7 +93,6 @@ def solve2(data):
                     new_coords[(coord[0],new_y)] = 1
 
         coords = new_coords
-
         mprint(new_coords)
         print()
 
