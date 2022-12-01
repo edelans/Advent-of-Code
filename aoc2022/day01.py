@@ -23,7 +23,14 @@ def solve1(data):
 
 def solve2(data):
     """Solves part2."""
-    pass
+    top3_calories = []
+    elves = data.split("\n\n")
+    for elf in elves:
+        elf_calories = sum([int(meal) for meal in elf.splitlines()])
+        top3_calories.append(elf_calories)
+        if len(top3_calories) > 3:
+            top3_calories = sorted(top3_calories, reverse=True)[:3]
+    return sum(top3_calories)
 
 
 """
