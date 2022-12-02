@@ -16,7 +16,7 @@ def get_points(shape1, shape2):
     shape_score = {
         "rock": 1,
         "paper": 2,
-        "scissors":3
+        "scissors": 3
     }
     win_score = {
         ("rock", "rock"): 3,
@@ -45,16 +45,51 @@ def solve1(data):
     total_score = 0
     for round in data.splitlines():
         (shape1, shape2) = (shape_map[x] for x in round.split(" "))
-        print((shape1, shape2))
-        total_score+= get_points(shape2, shape1)
-        print(get_points(shape2, shape1))
+        total_score += get_points(shape2, shape1)
     return total_score
-
 
 
 def solve2(data):
     """Solves part2."""
-    pass
+    total_score = 0
+    shape_map = {
+        "A": "rock",
+        "B": "paper",
+        "C": "scissors",
+    }
+    outcome_score_map = {
+        "X": 0,
+        "Y": 3,
+        "Z": 6
+    }
+    shape_score = {
+        "rock": 1,
+        "paper": 2,
+        "scissors": 3
+    }
+    shape_to_play = {
+        "rock": {
+            "X": "scissors",
+            "Y": "rock",
+            "Z": "paper"
+        },
+        "paper": {
+            "X": "rock",
+            "Y": "paper",
+            "Z": "scissors"
+        },
+        "scissors": {
+            "X": "paper",
+            "Y": "scissors",
+            "Z": "rock"
+        }
+    }
+    for round in data.splitlines():
+        opponent_shape, outcome = round.split(" ")
+        opponent_shape = shape_map[opponent_shape]
+        total_score += outcome_score_map[outcome] + shape_score[shape_to_play[opponent_shape][outcome]]
+
+    return total_score
 
 
 """
