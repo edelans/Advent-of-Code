@@ -30,7 +30,7 @@ def solve2(data):
         sac1 = set(lines[3*n+0])
         sac2 = set(lines[3*n+1])
         sac3 = set(lines[3*n+2])
-        common_item = sac1 & sac2 & sac3
+        common_item = sac1 & sac2 & sac3 # & is for intersection
         prio_sum += PRIORITIES.index(common_item.pop())
 
     return prio_sum
