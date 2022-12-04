@@ -11,3 +11,14 @@ Get to know Pycharm better.
 - https://github.com/mebeim/aoc/tree/master/2021
 
 # Learnings
+
+
+# Usage
+
+- don't forget to install a virtualenv (will be based on pyenv current python version)
+ 
+    pyenv virtualenv AoC 
+
+- to activate the env 
+
+    pyenv activate AoC
