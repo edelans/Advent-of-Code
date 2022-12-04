@@ -20,15 +20,39 @@ def solve1(data):
         if int2[0] < int1[0]:
             int1, int2 = int2, int1
 
+        if int2[0] == int1[0]:
+            # if the 2 intervals start on the same index, put the longest one as int1
+            if int2[1] > int1[1]:
+                int1, int2 = int2, int1
+
         if int1[1] >= int2[1]:
             inclusions += 1
+            print("{} includes {}".format(int1, int2))
 
     return inclusions
 
 
 def solve2(data):
     """Solves part2."""
-    pass
+    overlaps = 0
+    for line in data.splitlines():
+        int1, int2 = line.split(",")
+        int1 = [int(x) for x in int1.split("-")]
+        int2 = [int(x) for x in int2.split("-")]
+
+        if int2[0] < int1[0]:
+            int1, int2 = int2, int1
+
+        if int2[0] == int1[0]:
+            # if the 2 intervals start on the same index, put the longest one as int1
+            if int2[1] > int1[1]:
+                int1, int2 = int2, int1
+
+        if int2[0] <= int1[1]:
+            overlaps += 1
+            # print("{} overlaps {}".format(int1, int2))
+
+    return overlaps
 
 
 """
