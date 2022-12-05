@@ -47,10 +47,10 @@ def solve2(data):
     stacks, moves = parser(data)
 
     for move in moves:
-        to_move = []
-        for i in range(move[0]):
-            to_move.append(stacks[move[1] - 1].pop())
-        to_move.reverse()
+        stacks[move[1] - 1], to_move = (
+            stacks[move[1] - 1][: len(stacks[move[1] - 1]) - move[0]],
+            stacks[move[1] - 1][len(stacks[move[1] - 1]) - move[0] :],
+        )
         stacks[move[2] - 1].extend(to_move)
     return "".join([s[-1] for s in stacks])
 
