@@ -34,17 +34,21 @@ def solve1(data):
         for j in range(1, len(forest[i]) - 1):
             tree_height = forest[i][j]
             visibility_array = []
+
             left_visibility = all([forest[i][k] < tree_height for k in range(j)])
             if left_visibility:
                 visibility_array.append("left")
+
             right_visibility = all(
                 [forest[i][k] < tree_height for k in range(j + 1, len(forest[i]))]
             )
             if right_visibility:
                 visibility_array.append("right")
+
             up_visibility = all([forest[k][j] < tree_height for k in range(i)])
             if up_visibility:
                 visibility_array.append("up")
+
             down_visibility = all(
                 [forest[k][j] < tree_height for k in range(i + 1, len(forest))]
             )
