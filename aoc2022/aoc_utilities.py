@@ -73,9 +73,4 @@ def sign(x):
     note : sometimes it can be more useful to use math.copysign()
     see https://stackoverflow.com/a/1986718/1570104
     """
-    if x < 0:
-        return -1
-    elif x > 0:
-        return 1
-    else:
-        return 0
+    return bool(x > 0) - bool(x < 0)
