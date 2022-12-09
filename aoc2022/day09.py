@@ -91,6 +91,7 @@ def rope_print(rope, logLevel=10):
     print a map of the rope, provided as a list of position for each of his knots : [ (1,2), (0,0), ...]
     logLevel is an int, 10 is for debug, 20 is for info
     """
+
     xmax = max(max([int(i) for (i, j) in rope]), 10)
     xmin = min(min([int(i) for (i, j) in rope]), -10)
     ymax = max(max([int(j) for (i, j) in rope]), 10)
@@ -124,8 +125,10 @@ def solve2(data):
     for ins in instructions:
         for s in range(ins[1]):
             logger.debug(f"\nrunning step {s+1} from instruction {ins[0]} {ins[1]}")
-            rope[0] = vsum(rope[0], dir_vect[ins[0]])
-            # logger.debug(f"knot 0 is at position {rope[0]}")
+            rope[0] = (
+                rope[0][0] + dir_vect[ins[0]][0],
+                rope[0][1] + dir_vect[ins[0]][1],
+            )
             for i in range(1, len(rope)):
                 # reuse var names from solve1 so I can copy paste bc I'm lazy
                 hp = rope[i - 1]
@@ -136,12 +139,15 @@ def solve2(data):
                         int(math.copysign(1, hp[0] - tp[0])) if hp[0] != tp[0] else 0,
                         int(math.copysign(1, hp[1] - tp[1])) if hp[1] != tp[1] else 0,
                     )
-                    rope[i] = vsum(tp, move)
-                # logger.debug(f"knot {i} is at position {rope[i]}")
-                if i == 9:
-                    tail_positions.add(rope[i])
-                rope_print(rope, 10)
-        rope_print(rope, 20)
+                    rope[i] = (
+                        rope[i][0] + move[0],
+                        rope[i][1] + move[1],
+                    )
+                tail_positions.add(rope[9])
+                if logger.getEffectiveLevel() < 15:
+                    rope_print(rope, 10)
+        if logger.getEffectiveLevel() < 25:
+            rope_print(rope, 20)
 
     tprint(tail_positions, 20)
     return len(tail_positions)
