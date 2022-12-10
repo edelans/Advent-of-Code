@@ -28,7 +28,7 @@ DAY = os.path.basename(__file__)[3:5]
 def solve1(data):
     """Solves part 1."""
     cycles = [0]  # cycles[i] equals the value of the register AT THE END of cycle i
-    # storing all cycle values is use more memory,
+    # storing all cycle values uses more memory,
     # but simpler to troubleshout values during/after cycle...
     register = 1
 
@@ -54,7 +54,7 @@ def solve1(data):
 def solve2(data):
     """Solves part2."""
     cycles = [0]  # cycles[i] equals the value of the register AT THE END of cycle i
-    # storing all cycle values is use more memory,
+    # storing all cycle values uses more memory,
     # but simpler to troubleshout values during/after cycle...
     register = 1
 
@@ -89,7 +89,7 @@ def solve2(data):
             )
 
             logger.info(CRTRow)
-        print(CRTRow)
+        print(spacedCRTRow)
     return
 
 
