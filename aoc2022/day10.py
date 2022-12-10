@@ -27,7 +27,28 @@ DAY = os.path.basename(__file__)[3:5]
 
 def solve1(data):
     """Solves part 1."""
-    pass
+    cycles = [0]  # cycles[i] equals the value of the register AT THE END of cycle i
+    # storing all cycle values is use more memory,
+    # but simpler to troubleshout values during/after cycle...
+    register = 1
+
+    for line in data.splitlines():
+        line = line.split(" ")
+        if line[0] == "noop":
+            cycles.append(register)
+        else:
+            cycles.append(register)
+            register += int(line[1])
+            cycles.append(register)
+
+    interesting_cycles = [20, 60, 100, 140, 180, 220]
+    sum_signal_strength = 0
+    for c in interesting_cycles:
+        logger.info(
+            f"during cycle {c}, register X has the value {cycles[c-1]}, signal strength is {c * cycles[c-1]}"
+        )
+        sum_signal_strength += c * cycles[c - 1]
+    return sum_signal_strength
 
 
 def solve2(data):
