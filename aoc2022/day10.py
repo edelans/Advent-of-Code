@@ -53,7 +53,44 @@ def solve1(data):
 
 def solve2(data):
     """Solves part2."""
-    pass
+    cycles = [0]  # cycles[i] equals the value of the register AT THE END of cycle i
+    # storing all cycle values is use more memory,
+    # but simpler to troubleshout values during/after cycle...
+    register = 1
+
+    for line in data.splitlines():
+        line = line.split(" ")
+        if line[0] == "noop":
+            cycles.append(register)
+        else:
+            cycles.append(register)
+            register += int(line[1])
+            cycles.append(register)
+
+    for i in range(6):
+        CRTRowLetter = "#"
+        spacedCRTRow = ""
+        CRTRow = ""
+        for j in range(1, 40):
+            cycle = 40 * i + j
+            CRTindex = j - 1
+            register_index = cycles[cycle - 1]
+            if abs(register_index - CRTindex) <= 1:
+                CRTRowLetter += "#"
+                CRTRow += "#"
+            else:
+                CRTRowLetter += "."
+                CRTRow += "."
+            if len(CRTRowLetter) == 5:
+                spacedCRTRow += CRTRowLetter + "   "
+                CRTRowLetter = ""
+            logger.info(
+                f"during cycle {cycle}, CRT draws pixel in position {CRTindex}, register is at {register_index}"
+            )
+
+            logger.info(CRTRow)
+        print(CRTRow)
+    return
 
 
 """
