@@ -43,6 +43,7 @@ Use script args to execute the right function solve1 / solve2, with the right lo
   - python dayXX.py 2t 
 """
 if __name__ == "__main__":
+    """some logger levels : DEBUG, INFO, WARNING, CRITICAL"""
     if len(sys.argv) > 1 and sys.argv[1] == "1":
         logger.setLevel(logging.WARNING)
         res = solve1((Input(DAY).read()))
