@@ -95,7 +95,7 @@ def solve2(data):
 
     for n in m.keys():
         for v in neighbors_4(n):
-            if v[0] >= 0 and v[0] <= xmax and v[1] >= 0 and v[1] <= ymax:
+            if 0 <= v[0] <= xmax and 0 <= v[1] <= ymax:
                 if get_elevation(m, v) - get_elevation(m, n) <= 1:
                     G.add_edge(n, v)
                     logger.info(
