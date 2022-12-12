@@ -6,7 +6,6 @@ import sys
 import logging
 from aoc_utilities import Input, test_input, neighbors_4
 import networkx as nx
-import math
 
 """
 Logger config
@@ -91,8 +90,8 @@ def solve2(data):
     # build graph
     G = nx.DiGraph()
 
-    starting_points = [(i, j) for (i, j) in m.keys() if m[i, j] == "a"]
-    all_a_shortest_path = G.edges()
+    # initialise with a value I'm sure will be bigger than any shortest path
+    all_a_shortest_path = G.nodes()
 
     for n in m.keys():
         for v in neighbors_4(n):
@@ -102,15 +101,13 @@ def solve2(data):
                     logger.info(
                         f"adding edge from {m[n]} (elevation = {get_elevation(m, n)}) to {m[v]} (elevation = {get_elevation(m, v)})"
                     )
-    logger.info(f"graph is {G.edges()}")
-
-    for start in starting_points:
+    for start in [k for k, v in m.items() if v == "a"]:
         try:  # necessary bc in the input there are some "pockets" of "a" inaccessible from other parts of the graph...
             shortest_path = nx.astar_path(G, start, end)
+            if len(shortest_path) < len(all_a_shortest_path):
+                all_a_shortest_path = shortest_path
         except:
             pass
-        if len(shortest_path) < len(all_a_shortest_path):
-            all_a_shortest_path = shortest_path
 
     return len(all_a_shortest_path) - 1
 
