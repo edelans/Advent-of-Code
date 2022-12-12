@@ -105,7 +105,7 @@ def solve2(data):
     logger.info(f"graph is {G.edges()}")
 
     for start in starting_points:
-        try:  # necessary bc in the input there are some "pockets" of a inaccessible from other parts of the graph...
+        try:  # necessary bc in the input there are some "pockets" of "a" inaccessible from other parts of the graph...
             shortest_path = nx.astar_path(G, start, end)
         except:
             pass
