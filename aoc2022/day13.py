@@ -5,6 +5,7 @@ import os
 import sys
 import logging
 from aoc_utilities import Input, test_input
+from functools import cmp_to_key
 
 """
 Logger config
@@ -25,67 +26,65 @@ logger.addHandler(handler)
 DAY = os.path.basename(__file__)[3:5]
 
 
-def left_is_smaller(p1, p2):
-    # [1,1,3,1,1]
-    # [1,1,5,1,1]
-    if p1[0] == p2[0]:
-        return left_is_smaller(p1[1:], p2[1:])
-    if p1 == None:
-        return True
+def compare(p1, p2):
+    p1_is_int = type(p1) is int
+    p2_is_int = type(p2) is int
+
+    if p1_is_int and p2_is_int:
+        return p1 - p2
+    elif p1_is_int and not p2_is_int:
+        return compare([p1], p2)
+    elif not p1_is_int and p2_is_int:
+        return compare(p1, [p2])
     else:
-        logger.info(f"p1[0] is {p1[0]}, p2[0] is {p2[0]}")
-        if p1[0].isdigit() and p2[0].isdigit():
-            return int(p1[0]) < int(p2[0])
-        elif p1[0].isdigit() and not p2[0].isdigit():
-            if p2[1:]:
-                return left_is_smaller(p1, p2[1:])
-            else:
-                # Right side ran out of items
-                return False
-        elif not p1[0].isdigit() and p2[0].isdigit():
-            if p1[1:]:
-                return left_is_smaller(p1[1:], p2)
-            else:
-                # Left side ran out of items
-                return True
-        else:
-            if p1[0] == ",":
-                return False
-            elif p2[0] == ",":
-                return True
+        # both are lists
+        logger.info(f"p1 is {p1}, p2 is {p2}")
+        for x, y in zip(p1, p2):
+            res = compare(x, y)
+            if res != 0:
+                return res
+
+        # zip generates a list of the size of the smallest arg
+        # if nothing has been returned yet, we need to compare the size of the lists :
+        return len(p1) - len(p2)
 
 
 def solve1(data):
     """Solves part 1."""
     s = 0  # sum of indices
 
-    for i, pairs in enumerate(data.split("\n\n")):
-        p1, p2 = pairs.splitlines()
-        if left_is_smaller(p1, p2):
-            s += i + 1
+    for i, pairs in enumerate(data.split("\n\n"), 1):
+        # tough luck: input lines are valid python list, let's just eval() them
+        p1, p2 = map(eval, pairs.splitlines())
+        if compare(p1, p2) < 0:
+            s += i
             logger.info(
-                f"for pairs at indice {i + 1}, packet {p1} is smaller than {p2}\ns is {s}\n\n"
-            )
-        else:
-            logger.info(
-                f"for pairs at indice {i + 1}, packet {p1} is NOT smaller than {p2}\n\n"
+                f"for pairs at indice {i}, packet {p1} is smaller than {p2}\ns is {s}\n\n"
             )
 
     return s
-    # 5382 too high
 
 
 def solve2(data):
     """Solves part2."""
-    pass
+    all_packets = [[[2]], [[6]]]
+
+    for pairs in data.split("\n\n"):
+        # tough luck: input lines are valid python list, let's just eval() them
+        p1, p2 = map(eval, pairs.splitlines())
+        all_packets.append(p1)
+        all_packets.append(p2)
+
+    sorted_packets = sorted(all_packets, key=cmp_to_key(compare))
+    return (sorted_packets.index([[2]]) + 1) * (sorted_packets.index([[6]]) + 1)
 
 
 """
 Use script args to execute the right function solve1 / solve2, with the right logging level (only activated on test inputs)
-  - python dayXX.py 1
-  - python dayXX.py 1t
-  - python dayXX.py 2
-  - python dayXX.py 2t 
+  - time python dayXX.py 1
+  - time python dayXX.py 1t
+  - time python dayXX.py 2
+  - time python dayXX.py 2t 
 """
 if __name__ == "__main__":
     """some logger levels : DEBUG, INFO, WARNING, CRITICAL"""
