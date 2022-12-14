@@ -25,14 +25,150 @@ logger.addHandler(handler)
 DAY = os.path.basename(__file__)[3:5]
 
 
+def autorange(a, b):
+    """Go from a to b in steps of +/-1 regardless if a > b or b > a"""
+    if a > b:
+        yield from range(a, b - 1, -1)
+    yield from range(a, b + 1)
+
+
+def mprint(m):
+    """
+    Helper function to print a map
+    when the map is a dictionary, with keys as tuples of coordinates (1,2)
+    no need to have all the coordinates in the keys
+    """
+    xmin = min([int(i) for (i, j) in m.keys()])
+    xmax = max([int(i) for (i, j) in m.keys()])
+    ymin = min([int(j) for (i, j) in m.keys()])
+    ymax = max([int(j) for (i, j) in m.keys()])
+    for y in range(ymin, ymax + 1, 1):
+        print("".join([str(m.get((x, y), ".")) for x in range(xmin, xmax + 1)]))
+    return
+
+
+def parser(data):
+    """returns the map"""
+    m = {}  # coordinates map
+
+    for l in data.splitlines():
+        l = l.split(" -> ")
+        for i in range(1, len(l)):
+            fromx, fromy = map(int, l[i - 1].split(","))
+            tox, toy = map(int, l[i].split(","))
+            if fromx == tox:
+                # vertical line
+                (fromy, toy) = (fromy, toy) if fromy < toy else (toy, fromy)
+                for y in range(fromy, toy + 1):
+                    m[(fromx, y)] = "#"
+            elif fromy == toy:
+                # horizontal line
+                (fromx, tox) = (fromx, tox) if fromx < tox else (tox, fromx)
+                for x in range(fromx, tox + 1):
+                    m[(x, fromy)] = "#"
+    return m
+
+
+def simulate(source, m):
+    """
+    source is a tupple of coordinates, where sand originates
+    m is a dict mapping the cave
+    returns where the sand will stop if it falls from source, or an error if no place to rest
+    """
+    sx, sy = source
+    maxy = max([y for (x, y) in m.keys()])
+
+    while sy < maxy + 1:
+
+        if (sx, sy + 1) not in m.keys():
+            logger.info("moving down")
+            sy += 1
+        elif (sx - 1, sy + 1) not in m.keys():
+            logger.info("moving diag left")
+            sx -= 1
+            sy += 1
+        elif (sx + 1, sy + 1) not in m.keys():
+            logger.info("moving diag right")
+            sx += 1
+            sy += 1
+        else:
+            # can't fall further
+            logger.info(f"found a place to rest : {sx},{sy}")
+            return (sx, sy)
+    logger.info("Sand can't final a place to rest")
+    raise AttributeError("Sand can't final a place to rest")
+
+
 def solve1(data):
     """Solves part 1."""
-    pass
+    m = parser(data)
+    source = (500, 0)
+    m[source] = "+"
+
+    units = 0
+
+    while True:
+        logger.info(f"\nunit of sand {units + 1}")
+        try:
+            (sx, sy) = simulate(source, m)
+            m[(sx, sy)] = "o"
+            units += 1
+            # mprint(m)
+        except AttributeError:
+            logger.info("raised exception")
+            break
+
+    return units
+
+
+def simulate2(source, m, floory):
+    """
+    source is a tupple of coordinates, where sand originates
+    m is a dict mapping the cave
+    returns where the sand will stop if it falls from source, or an error if no place to rest
+    """
+    sx, sy = source
+    maxy = max([y for (x, y) in m.keys()])
+
+    while sy < maxy + 1:
+
+        if (sx, sy + 1) not in m.keys():
+            logger.info("moving down")
+            sy += 1
+        elif (sx - 1, sy + 1) not in m.keys():
+            logger.info("moving diag left")
+            sx -= 1
+            sy += 1
+        elif (sx + 1, sy + 1) not in m.keys():
+            logger.info("moving diag right")
+            sx += 1
+            sy += 1
+        else:
+            # can't fall further
+            logger.info(f"found a place to rest : {sx},{sy}")
+            return (sx, sy)
+    logger.info("fall on the floor")
+    return (sx, floory - 1)
 
 
 def solve2(data):
     """Solves part2."""
-    pass
+    m = parser(data)
+    source = (500, 0)
+    m[source] = "+"
+    floory = max([y for (x, y) in m.keys()]) + 2
+    units = 0
+
+    while True:
+        logger.info(f"\nunit of sand {units + 1}")
+        (sx, sy) = simulate2(source, m, floory)
+        m[(sx, sy)] = "o"
+        units += 1
+        # mprint(m)
+        if (sx, sy) == source:
+            return units
+
+    return units
 
 
 """
