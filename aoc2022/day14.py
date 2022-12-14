@@ -25,13 +25,6 @@ logger.addHandler(handler)
 DAY = os.path.basename(__file__)[3:5]
 
 
-def autorange(a, b):
-    """Go from a to b in steps of +/-1 regardless if a > b or b > a"""
-    if a > b:
-        yield from range(a, b - 1, -1)
-    yield from range(a, b + 1)
-
-
 def mprint(m):
     """
     Helper function to print a map
