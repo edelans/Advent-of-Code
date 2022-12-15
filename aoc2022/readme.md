@@ -12,6 +12,11 @@ Get to know Pycharm better.
 
 # Learnings
 
+you can use underscore to make big numbers easier to read:
+
+    >>> A = 2_000
+    >>> A
+    2000
 
 # Usage
 
