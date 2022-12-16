@@ -26,6 +26,8 @@ logger.addHandler(handler)
 # 2 digit day fetched from filename
 DAY = os.path.basename(__file__)[3:5]
 
+TIME_LIMIT = 30
+
 
 def parser(data):
     G = nx.Graph()
@@ -41,45 +43,82 @@ def parser(data):
     return G
 
 
+CURRENT_MAX_EXPECTATION = -1
+
+
 def max_path(state):
+    global CURRENT_MAX_EXPECTATION
     G = state["G"]
-    logger.info(f"current path length is {len(state['path'])}")
-    if len(state["path"]) < 5:
-        actions = []
+    # logger.info(f"current path length is {len(state['path'])}")
 
-        if G.nodes[state["current_node"]]["closed"]:
-            # open the valve
-            newG = G.copy()
-            newG.nodes[state["current_node"]]["closed"] = False
-            actions.append(
-                max_path(
-                    {
-                        "path": state["path"] + [f"open valve {state['current_node']}"],
-                        "current_node": state["current_node"],
-                        "pressure_released": state["pressure_released"]
-                        + (30 - len(state["path"]))
-                        * G.nodes[state["current_node"]]["rate"],
-                        "G": newG,
-                    }
-                )
-            )
+    # pruning
+    remaining_time = TIME_LIMIT - len(state["path"])
 
-        for n in G.neighbors(state["current_node"]):
-            # move to neighbor n
-            actions.append(
-                max_path(
-                    {
-                        "path": state["path"] + [f"go to node {n}"],
-                        "current_node": n,
-                        "pressure_released": state["pressure_released"],
-                        "G": G,
-                    }
-                )
-            )
-        return max(actions, key=lambda a: a["pressure_released"])
+    closed_valves = [n for n in G.nodes() if G.nodes[n]["closed"]]
+    remaining_rates = sorted([G.nodes[n]["rate"] for n in closed_valves], reverse=True)
+
+    potential = 0
+    for i, time in enumerate(range(remaining_time - 1, 0, -2)):
+        potential += remaining_rates[i] * time
+        if i + 2 > len(remaining_rates):
+            break
+
+    logger.info(
+        f"potential is {potential}, expected final pressure is {state['pressure_released']} current max is {CURRENT_MAX_EXPECTATION} , remaining time {remaining_time}"
+    )
+    if state["pressure_released"] + potential < CURRENT_MAX_EXPECTATION:
+        # drop this branch
+        logger.info(
+            f"droping path {state['path']}, cause potential {potential} is too low to catch up {CURRENT_MAX_EXPECTATION} with remaining time {remaining_time} while at pressure {state['pressure_released']}"
+        )
+        return {"path": [], "current_node": "AA", "pressure_released": 0, "G": G}
 
     else:
-        return state
+        if len(state["path"]) < TIME_LIMIT:
+            actions = []
+            if (
+                G.nodes[state["current_node"]]["closed"]
+                and G.nodes[state["current_node"]]["rate"] >= 1
+            ):
+                # open the valve
+                newG = G.copy()
+                newG.nodes[state["current_node"]]["closed"] = False
+                final_pressure_expectation = (
+                    state["pressure_released"]
+                    + (30 - len(state["path"]) - 1)
+                    * G.nodes[state["current_node"]]["rate"]
+                )
+                actions.append(
+                    max_path(
+                        {
+                            "path": state["path"]
+                            + [f"open valve {state['current_node']}"],
+                            "current_node": state["current_node"],
+                            "pressure_released": final_pressure_expectation,
+                            "G": newG,
+                        }
+                    )
+                )
+
+                if final_pressure_expectation > CURRENT_MAX_EXPECTATION:
+                    CURRENT_MAX_EXPECTATION = final_pressure_expectation
+            for n in G.neighbors(state["current_node"]):
+                # move to neighbor n
+                actions.append(
+                    max_path(
+                        {
+                            "path": state["path"] + [f"go to node {n}"],
+                            "current_node": n,
+                            "pressure_released": state["pressure_released"],
+                            "G": G,
+                        }
+                    )
+                )
+
+            return max(actions, key=lambda a: a["pressure_released"])
+
+        else:
+            return state
 
 
 def solve1(data):
@@ -103,6 +142,7 @@ Use script args to execute the right function solve1 / solve2, with the right lo
 """
 if __name__ == "__main__":
     """some logger levels : DEBUG, INFO, WARNING, CRITICAL"""
+    print(f"TIME_LIMIT is {TIME_LIMIT}")
     if len(sys.argv) > 1 and sys.argv[1] == "1":
         logger.setLevel(logging.WARNING)
         res = solve1((Input(DAY).read()))
