@@ -28,6 +28,7 @@ JET_PATTERN = ""
 JET_INDEX = 0
 CYCLE = 0
 YCYCLE = 0
+YMAX = 0
 
 ROCKS = {
     0: {
@@ -52,7 +53,7 @@ ROCKS = {
     },
 }
 
-ALL_FIRST_50_LINES = set([(x, y) for x in range(50) for y in range(7)])
+chamber = set([(x, 0) for x in range(7)])
 
 
 def mdump(m):
@@ -101,16 +102,16 @@ def jet_move(rock_coords, next_jet, chamber):
     return None
 
 
-def add_rock(i, chamber):
+def add_rock(i):
     rock_id = i % 5  # 0 is the horizontal bar ####, 4 is the 2x2 square
-    global JET_INDEX, JET_PATTERN, CYCLE, YCYCLE
+    global JET_INDEX, JET_PATTERN, CYCLE, YCYCLE, chamber
     """
     Each rock appears so that 
     its left edge is two units away from the left wall 
     and its bottom edge is three units above the highest rock in the room
     """
 
-    skyline = [max([y for (xc, y) in chamber if xc == x]) for x in range(7)]
+    skyline = [max([y for (xc, y) in chamber if xc == x], default=0) for x in range(7)]
     # logger.critical(f"skyline different values are  {len(set(skyline))}")
 
     if i > 0 and len(set(skyline)) == 1:
@@ -157,7 +158,8 @@ def add_rock(i, chamber):
                 return
         logger.info(f"rock_coords are {rock_coords}")
 
-    return chamber | set(rock_coords)
+    chamber.update(set(rock_coords))
+    return
 
 
 def solve1():
@@ -165,7 +167,7 @@ def solve1():
     chamber = set([(x, 0) for x in range(7)])
     print(chamber)
     for i in range(2022):
-        if i % 100 == 0:
+        if i % 1000 == 0:
             logger.warning(f"reached i = {i}")
             logger.debug(mdump(chamber))
 
@@ -177,24 +179,21 @@ def solve1():
 
 def solve2(data):
     """Solves part2."""
-    global CYCLE, YCYCLE
-    chamber = set([(x, 0) for x in range(7)])
+    global CYCLE, YCYCLE, chamber
+
     print(chamber)
     print(f"CYCLE is {CYCLE}")
     i = 0
     while CYCLE < 1:
-        if i % 100 == 0:
+        if i % 1000 == 0:
             logger.warning(f"reached i = {i}")
-            logger.debug(mdump(chamber))
-            logger.warning(f"chamber has size {len(chamber)}")
-        chamber = add_rock(i, chamber)
-        logger.debug(mdump(chamber))
+        add_rock(i)
         i += 1
 
     cycles_to_res = 1_000_000_000 // YCYCLE
     remaining = 1_000_000_000 % YCYCLE
     for i in range(remaining):
-        chamber = add_rock(i, chamber)
+        add_rock(i)
 
     return max([y for (x, y) in chamber]) + cycles_to_res * YCYCLE
 
