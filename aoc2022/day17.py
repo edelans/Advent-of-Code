@@ -103,7 +103,7 @@ def jet_move(rock_coords, next_jet, chamber):
 
 def add_rock(i, chamber):
     rock_id = i % 5  # 0 is the horizontal bar ####, 4 is the 2x2 square
-    global JET_INDEX, JET_PATTERN, CYCLE
+    global JET_INDEX, JET_PATTERN, CYCLE, YCYCLE
     """
     Each rock appears so that 
     its left edge is two units away from the left wall 
@@ -111,6 +111,8 @@ def add_rock(i, chamber):
     """
 
     skyline = [max([y for (xc, y) in chamber if xc == x]) for x in range(7)]
+    # logger.critical(f"skyline different values are  {len(set(skyline))}")
+
     if i > 0 and len(set(skyline)) == 1:
         logger.critical(f"CYCLE DETECTED for i={i}, y is {skyline[0]}")
         YCYCLE = skyline[0]
@@ -175,11 +177,13 @@ def solve1():
 
 def solve2(data):
     """Solves part2."""
+    global CYCLE, YCYCLE
     chamber = set([(x, 0) for x in range(7)])
     print(chamber)
+    print(f"CYCLE is {CYCLE}")
     i = 0
     while CYCLE < 1:
-        if i % 1_000_000_000 == 0:
+        if i % 100 == 0:
             logger.warning(f"reached i = {i}")
             logger.debug(mdump(chamber))
             logger.warning(f"chamber has size {len(chamber)}")
@@ -220,7 +224,7 @@ if __name__ == "__main__":
         res = solve2((Input(DAY).read()))
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "2t":
-        logger.setLevel(logging.CRITICAL)
+        logger.setLevel(logging.WARNING)
         JET_PATTERN = test_input(DAY).read()
         res = solve2((test_input(DAY).read()))
         print(res)
