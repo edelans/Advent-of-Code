@@ -6,6 +6,8 @@ import sys
 import logging
 from aoc_utilities import Input, test_input
 
+from operator import itemgetter
+
 """
 Logger config
   use logger.ingo("") instead of print statement
@@ -73,7 +75,8 @@ def mdump(m):
     return dump
 
 
-def jet_move(rock_coords, next_jet, chamber):
+def jet_move(rock_coords, next_jet):
+    global chamber
     if next_jet == ">":
         new_rock_coords = [(x + 1, y) for (x, y) in rock_coords]
         for c in new_rock_coords:
@@ -104,23 +107,14 @@ def jet_move(rock_coords, next_jet, chamber):
 
 def add_rock(i):
     rock_id = i % 5  # 0 is the horizontal bar ####, 4 is the 2x2 square
-    global JET_INDEX, JET_PATTERN, CYCLE, YCYCLE, chamber
+    global JET_INDEX, JET_PATTERN, CYCLE, YCYCLE, chamber, YMAX
     """
     Each rock appears so that 
     its left edge is two units away from the left wall 
     and its bottom edge is three units above the highest rock in the room
     """
 
-    skyline = [max([y for (xc, y) in chamber if xc == x], default=0) for x in range(7)]
-    # logger.critical(f"skyline different values are  {len(set(skyline))}")
-
-    if i > 0 and len(set(skyline)) == 1:
-        logger.critical(f"CYCLE DETECTED for i={i}, y is {skyline[0]}")
-        YCYCLE = skyline[0]
-        chamber = set([(x, 0) for x in range(7)])
-        CYCLE += 1
-    logger.info(f"skyline is {skyline}")
-    basey = max(skyline) + 4
+    basey = YMAX + 4
     rock_coords = [(x, y + basey) for (x, y) in ROCKS[rock_id]["base_coords"]]
     logger.info(f"rocks appears with coords {rock_coords}")
 
@@ -136,7 +130,7 @@ def add_rock(i):
     while True:
         next_jet = JET_PATTERN[JET_INDEX]
         JET_INDEX = JET_INDEX + 1 if JET_INDEX < len(JET_PATTERN) - 1 else 0
-        rock_coords = jet_move(rock_coords, next_jet, chamber)
+        rock_coords = jet_move(rock_coords, next_jet)
         touch = False
         rock_coords_after_fall = [(x, y - 1) for (x, y) in rock_coords]
         for praf in rock_coords_after_fall:
@@ -157,32 +151,25 @@ def add_rock(i):
                 logger.critical(f"oh shit, rock coords are {rock_coords}")
                 return
         logger.info(f"rock_coords are {rock_coords}")
-
     chamber.update(set(rock_coords))
+    YMAX = max(map(itemgetter(1), chamber))
     return
 
 
 def solve1():
     """Solves part 1."""
-    chamber = set([(x, 0) for x in range(7)])
-    print(chamber)
+    global chamber
     for i in range(2022):
         if i % 1000 == 0:
             logger.warning(f"reached i = {i}")
-            logger.debug(mdump(chamber))
-
-        chamber = add_rock(i, chamber)
-        logger.warning(f"chamber has size {len(chamber)}")
+        add_rock(i)
         logger.debug(mdump(chamber))
-    return max([y for (x, y) in chamber]) + CYCLE * YCYCLE
+    return YMAX
 
 
 def solve2(data):
     """Solves part2."""
     global CYCLE, YCYCLE, chamber
-
-    print(chamber)
-    print(f"CYCLE is {CYCLE}")
     i = 0
     while CYCLE < 1:
         if i % 1000 == 0:
@@ -213,7 +200,7 @@ if __name__ == "__main__":
         res = solve1()
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "1t":
-        logger.setLevel(logging.CRITICAL)
+        logger.setLevel(logging.WARNING)
         JET_PATTERN = test_input(DAY).read()
         res = solve1()
         print(res)
