@@ -44,19 +44,19 @@ Use script args to execute the right function solve1 / solve2, with the right lo
 """
 if __name__ == "__main__":
     """some logger levels : DEBUG, INFO, WARNING, CRITICAL"""
-    if len(sys.argv) > 1 and sys.argv[1] == "1":
-        logger.setLevel(logging.WARNING)
-        res = solve1((Input(DAY).read()))
-        print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "1t":
         logger.setLevel(logging.INFO)
         res = solve1((test_input(DAY).read()))
         print(res)
-    if len(sys.argv) > 1 and sys.argv[1] == "2":
+    if len(sys.argv) > 1 and sys.argv[1] == "1":
         logger.setLevel(logging.WARNING)
-        res = solve2((Input(DAY).read()))
+        res = solve1((Input(DAY).read()))
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "2t":
         logger.setLevel(logging.INFO)
         res = solve2((test_input(DAY).read()))
+        print(res)
+    if len(sys.argv) > 1 and sys.argv[1] == "2":
+        logger.setLevel(logging.WARNING)
+        res = solve2((Input(DAY).read()))
         print(res)
