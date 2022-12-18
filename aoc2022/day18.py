@@ -36,7 +36,6 @@ def get_all_faces(point):
         [(x, y, z), (x + 1, y, z), (x, y + 1, z), (x + 1, y + 1, z)],
         [(x, y, z+1), (x + 1, y, z+1), (x, y + 1, z+1), (x + 1, y + 1, z+1)],
     ]
-    print(faces)
     for f in faces:
         all_faces.add(tuple(sorted(f)))
 
@@ -51,7 +50,6 @@ def solve1(data):
 
     for line in data.splitlines():
         x,y,z = map(int, line.split(","))
-        print(x)
         for side in get_all_faces((x,y,z)):
             if side not in free_sides:
                 free_sides.add(side)
@@ -65,7 +63,52 @@ def solve1(data):
 
 def solve2(data):
     """Solves part2."""
-    pass
+    free_sides = set()
+    k=0
+
+    for line in data.splitlines():
+        x,y,z = map(int, line.split(","))
+        for side in get_all_faces((x,y,z)):
+            if side not in free_sides:
+                free_sides.add(side)
+            else:
+                free_sides.remove(side)
+
+
+    # in those free sides, some are external, some are internal
+    # we want to count the external
+    # one is external if one of its edges belong to the largest set of connecting edges
+
+    # start from one edge
+    result = {}
+    while free_sides:
+        surface = set()
+        side = free_sides.pop()
+        surface.add(side)
+        edges = set([edge for edge in side])
+        intersect = True
+        while intersect:
+            print(f"free_sides size is {len(free_sides)}")
+            fs = free_sides.copy()
+            intersect = False
+            for s in fs:
+
+
+
+                if len(edges & set([si for si in s])) > 0:
+                    free_sides.remove(s)
+                    edges.update([edge for edge in s])
+                    surface.add(s)
+                    intersect = True
+
+        result[side] = len(surface)
+
+    return result
+    # 4114 too high
+
+
+
+
 
 
 """
