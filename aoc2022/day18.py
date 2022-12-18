@@ -25,34 +25,38 @@ logger.addHandler(handler)
 DAY = os.path.basename(__file__)[3:5]
 
 
-def get_all_faces((x,y,z)):
+def get_all_faces(point):
+    (x,y,z) = point
     all_faces = set()
     faces = [
-        [(x, y, z), (x, y, z+1), (x, y+1, z), (x, y+1, z+1)]
-        [(x+1, y, z), (x+1, y, z+1), (x+1, y+1, z), (x+1, y+1, z+1)]
-        [(x, y, z),(x+1, y, z),(x, y, z+1),(x+1, y, z+1)]
-        [(x, y+1, z),(x+1, y+1, z),(x, y+1, z+1),(x+1, y+1, z+1)]
+        [(x, y, z), (x, y, z+1), (x, y+1, z), (x, y+1, z+1)],
+        [(x+1, y, z), (x+1, y, z+1), (x+1, y+1, z), (x+1, y+1, z+1)],
+        [(x, y, z),(x+1, y, z),(x, y, z+1),(x+1, y, z+1)],
+        [(x, y+1, z),(x+1, y+1, z),(x, y+1, z+1),(x+1, y+1, z+1)],
         [(x, y, z), (x + 1, y, z), (x, y + 1, z), (x + 1, y + 1, z)],
         [(x, y, z+1), (x + 1, y, z+1), (x, y + 1, z+1), (x + 1, y + 1, z+1)],
     ]
+    print(faces)
     for f in faces:
         all_faces.add(tuple(sorted(f)))
+
     return all_faces
 
 
 
 def solve1(data):
     """Solves part 1."""
-    free_sides = {}
+    free_sides = set()
     k=0
 
     for line in data.splitlines():
         x,y,z = map(int, line.split(","))
+        print(x)
         for side in get_all_faces((x,y,z)):
             if side not in free_sides:
-                free_sides+=side
+                free_sides.add(side)
             else:
-                free_sides.del(side)
+                free_sides.remove(side)
     return len(free_sides)
 
 
