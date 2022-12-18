@@ -18,6 +18,13 @@ you can use underscore to make big numbers easier to read:
     >>> A
     2000
 
+
+`default` keyword : 
+
+    >>> max([], default=99)
+    99
+
+
 # Usage
 
 - don't forget to install a virtualenv (will be based on pyenv current python version)
