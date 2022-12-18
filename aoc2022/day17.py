@@ -62,10 +62,8 @@ def mdump(m):
     """
     Helper function to print a set
     """
-    ymin = min([i for (i, j) in m])
-    ymax = max([j for (i, j) in m])
     dump = ""
-    for y in range(ymax, ymin - 1, -1):
+    for y in range(YMAX, - 1, -1):
         for x in range(7):
             if (x, y) in m:
                 dump += "#"
@@ -75,8 +73,21 @@ def mdump(m):
     return dump
 
 
+def mdump_lasty(m, size):
+    """
+    Helper function to print a set
+    """
+    dump = ""
+    for y in range(YMAX, YMAX - size - 1, -1):
+        for x in range(7):
+            if (x, y) in m:
+                dump += "#"
+            else:
+                dump += "."
+        dump += "\n"
+    return dump
+
 def jet_move(rock_coords, next_jet):
-    global chamber
     if next_jet == ">":
         new_rock_coords = [(x + 1, y) for (x, y) in rock_coords]
         for c in new_rock_coords:
@@ -145,7 +156,7 @@ def add_rock(i):
             break
         else:
             # fall down 1 unit
-            rock_coords = [(x, y - 1) for (x, y) in rock_coords]
+            rock_coords = rock_coords_after_fall
             logger.debug("Rock falls 1 unit")
             if any([y < 0 for (x, y) in rock_coords]):
                 logger.critical(f"oh shit, rock coords are {rock_coords}")
@@ -163,14 +174,14 @@ def solve1():
         if i % 1000 == 0:
             logger.warning(f"reached i = {i}")
         add_rock(i)
-        logger.debug(mdump(chamber))
+
     return YMAX
 
 
 def solve2(data):
     """Solves part2."""
     global ICYCLE, YCYCLE, chamber
-    previous = {}
+    previous = set()
     i = 0
     while ICYCLE < 1:
         if i % 1000 == 0:
@@ -180,9 +191,16 @@ def solve2(data):
 
         # CYCLE DETECTOR
         if i % (len(JET_PATTERN) * len(ROCKS)) == 0:
+            dump = mdump_lasty(chamber, 200)
+            logger.warning(dump)
+            if dump in previous:
+                print("CYCLE DETECTED")
+                return
+            else:
+                previous.add(dump)
             # cycle can only happen on a multiple of the size of each problem inputs
             skyline = [max([y for (xc, y) in chamber if xc == x]) for x in range(7)]
-            logger.critical(f"testing cycle....")
+            logger.critical(f"testing cycle at i = {i}")
             if len(set(skyline)) == 1:
                 logger.critical(f"top line is a flat line, like initial state!")
                 ICYCLE = i
@@ -191,10 +209,11 @@ def solve2(data):
     cycles_to_res = 1_000_000_000 // ICYCLE
     remaining = 1_000_000_000 % ICYCLE
     chamber = set([(x, 0) for x in range(7)])
+    YMAX = 0
     for i in range(remaining):
         add_rock(i)
 
-    return max([y for (x, y) in chamber]) + cycles_to_res * YCYCLE
+    return YMAX + cycles_to_res * YCYCLE
 
 
 """

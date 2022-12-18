@@ -1,228 +1,195 @@
 #!/usr/bin/env python3
-"""This script solves puzzles of https://adventofcode.com/"""
 
-import os
-import sys
-import logging
-from aoc_utilities import Input, test_input
+from itertools import repeat
 
-from operator import itemgetter
+from utils.all import *
 
-"""
-Logger config
-  use logger.ingo("") instead of print statement
-  those messages will be displayed while running the code on testing sets
-  but not displayed while running on real puzzle inputs
-  note: when you want to avoid logging, 
-  be careful to also skip any expensive computation leading to what you want to log
-"""
-logger = logging.getLogger(__name__)
-handler = logging.StreamHandler()
-formatter = logging.Formatter("%(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+def loop(data):
+	for i in count(0):
+		yield data[i % len(data)]
 
+def newrock(off, topy):
+	r = []
+	for dx, dy in off:
+		r.append([dx + 2, (topy + dy + 4)])
+	return r
 
-# 2 digit day fetched from filename
-DAY = os.path.basename(__file__)[3:5]
+def left(r):
+	for i, (x, y) in enumerate(r):
+		r[i] = (x - 1, y)
 
-JET_PATTERN = ""
-JET_INDEX = 0
-ICYCLE = 0
-YCYCLE = 0
-YMAX = 0
+def right(r):
+	for i, (x, y) in enumerate(r):
+		r[i] = (x + 1, y)
 
-ROCKS = {
-    0: {
-        "base_coords": [(2, 0), (3, 0), (4, 0), (5, 0)],
-        "name": "-",
-    },
-    1: {
-        "base_coords": [(3, 0), (2, 1), (3, 1), (4, 1), (3, 2)],
-        "name": "+",
-    },
-    2: {
-        "base_coords": [(2, 0), (3, 0), (4, 0), (4, 1), (4, 2)],
-        "name": "_|",
-    },
-    3: {
-        "base_coords": [(2, 0), (2, 1), (2, 2), (2, 3)],
-        "name": "|",
-    },
-    4: {
-        "base_coords": [(2, 0), (3, 0), (2, 1), (3, 1)],
-        "name": "=",
-    },
-}
+def down(r):
+	for i, (x, y) in enumerate(r):
+		r[i] = (x, y - 1)
 
-chamber = set([(x, 0) for x in range(7)])
+def collision(rock, direction):
+	if direction == 'l':
+		if any(x == 0 for x,_ in rock):
+			# eprint('Collision L wall')
+			return True
 
+		for x, y in rock:
+			if (x - 1, y) in space:
+				# eprint('Collision L')
+				return True
+	elif direction == 'r':
+		if any(x == 6 for x,_ in rock):
+			# eprint('Collision R wall')
+			return True
 
-def mdump(m):
-    """
-    Helper function to print a set
-    """
-    ymin = min([i for (i, j) in m])
-    ymax = max([j for (i, j) in m])
-    dump = ""
-    for y in range(ymax, ymin - 1, -1):
-        for x in range(7):
-            if (x, y) in m:
-                dump += "#"
-            else:
-                dump += "."
-        dump += "\n"
-    return dump
+		for x, y in rock:
+			if (x + 1, y) in space:
+				# eprint('Collision R')
+				return True
+	elif direction == 'd':
+		if any(y == 1 for _,y in rock):
+			# eprint('Collision bottom')
+			return True
+
+		for x, y in rock:
+			if (x, y - 1) in space:
+				# eprint('Collision D')
+				return True
+	return False
+
+def dump():
+	res = ''
+	for y in range(topy + 7, -1, -1):
+		for x in range(7):
+			if (x, y) in space:
+				res += '#'
+			elif (x, y) in rock:
+				res += 'o'
+			else:
+				res += ' '
+		res += '\n'
+
+	# eprint(res)
+	# eprint('-' * 20)
 
 
-def jet_move(rock_coords, next_jet):
-    global chamber
-    if next_jet == ">":
-        new_rock_coords = [(x + 1, y) for (x, y) in rock_coords]
-        for c in new_rock_coords:
-            if c in chamber:
-                return rock_coords
+advent.setup(2022, 17)
+DEBUG = 'debug' in map(str.lower, sys.argv)
+fin = advent.get_input() if not DEBUG else io.StringIO('''\
+>>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>
+''')
 
-        if 6 in [x for x, y in rock_coords]:
-            return rock_coords
+data = fin.read().strip()
+timer_start()
 
-        logger.info("Jet of gas pushes rock right")
-        return new_rock_coords
+offsets = [
+	((0, 0), (1, 0), (2, 0), (3, 0)),
+	((1, 0), (0, 1), (1, 1), (2, 1), (1, 2)),
+	((0, 0), (1, 0), (2,0), (2, 1), (2, 2)),
+	((0, 0), (0, 1), (0, 2), (0,3)),
+	((0, 0), (1, 0), (0, 1), (1, 1))
+]
 
-    elif next_jet == "<":
+moves = loop(data)
+space = {(i, 0) for i in range(7)}
+topy  = 0
 
-        new_rock_coords = [(x - 1, y) for (x, y) in rock_coords]
-        for c in new_rock_coords:
-            if c in chamber:
-                return rock_coords
+for n in range(2022):
+	# eprint('=' * 20, 'rock', n + 1, '=' * 30)
+	rock = newrock(offsets[n % len(offsets)], topy)
 
-        if 0 in [x for x, y in rock_coords]:
-            return rock_coords
+	while 1:
+		# eprint(rock)
 
-        logger.info("Jet of gas pushes rock left")
-        return new_rock_coords
+		move = next(moves)
+		if move == '<' and not collision(rock, 'l'):
+			left(rock)
+			# eprint('Move left', rock)
+		elif move == '>' and not collision(rock, 'r'):
+			right(rock)
+			# eprint('Move right', rock)
+		# else:
+			# eprint('No lateral move')
 
-    return None
+		# dump()
 
+		if collision(rock, 'd'):
+			space.update(map(tuple, rock))
+			topy = max(map(itemgetter(1), space))
+			break
 
-def add_rock(i):
-    rock_id = i % 5  # 0 is the horizontal bar ####, 4 is the 2x2 square
-    global JET_INDEX, JET_PATTERN, chamber, YMAX
-    """
-    Each rock appears so that 
-    its left edge is two units away from the left wall 
-    and its bottom edge is three units above the highest rock in the room
-    """
+		down(rock)
 
-    basey = YMAX + 4
-    rock_coords = [(x, y + basey) for (x, y) in ROCKS[rock_id]["base_coords"]]
-    logger.info(f"rocks appears with coords {rock_coords}")
+		# eprint('Move down', rock)
+		# dump()
 
-    """
-    After a rock appears, it alternates between 
-    - being pushed by a jet of hot gas one unit (in the direction indicated by the next symbol in the jet pattern) 
-    - and then falling one unit down. 
-    If any movement would cause any part of the rock to move into the walls, floor, or a stopped rock, 
-      the movement instead does not occur. 
-      If a downward movement would have caused a falling rock to move into the floor or an already-fallen rock, 
-        the falling rock stops where it is (having landed on something) and a new rock immediately begins falling.
-    """
-    while True:
-        next_jet = JET_PATTERN[JET_INDEX]
-        JET_INDEX = JET_INDEX + 1 if JET_INDEX < len(JET_PATTERN) - 1 else 0
-        rock_coords = jet_move(rock_coords, next_jet)
-        touch = False
-        rock_coords_after_fall = [(x, y - 1) for (x, y) in rock_coords]
-        for praf in rock_coords_after_fall:
-            # point for rock after fall
-            if praf in chamber:
-                touch = True
-                logger.info(f"rock touches at {praf}")
-                break
-
-        if touch:
-            logger.debug("Rock comes to rest:")
-            break
-        else:
-            # fall down 1 unit
-            rock_coords = [(x, y - 1) for (x, y) in rock_coords]
-            logger.debug("Rock falls 1 unit")
-            if any([y < 0 for (x, y) in rock_coords]):
-                logger.critical(f"oh shit, rock coords are {rock_coords}")
-                return
-        logger.info(f"rock_coords are {rock_coords}")
-    chamber.update(set(rock_coords))
-    YMAX = max(map(itemgetter(1), chamber))
-    return
+advent.print_answer(1, topy)
 
 
-def solve1():
-    """Solves part 1."""
-    global chamber
-    for i in range(2022):
-        if i % 1000 == 0:
-            logger.warning(f"reached i = {i}")
-        add_rock(i)
-        logger.debug(mdump(chamber))
-    return YMAX
+moves = loop(data)
+space = {(i, 0) for i in range(7)}
+topy  = 0
+previous = {}
+n = 0
+skipped = None
+totrocks = 1000000000000
+iteration = 0
 
+while n < totrocks:
+	# eprint('=' * 20, 'rock', n + 1, '=' * 30)
+	rocktype = n % len(offsets)
+	rock = newrock(offsets[rocktype], topy)
 
-def solve2(data):
-    """Solves part2."""
-    global ICYCLE, YCYCLE, chamber
-    previous = {}
-    i = 0
-    while ICYCLE < 1:
-        if i % 1000 == 0:
-            logger.warning(f"reached i = {i}")
-        add_rock(i)
-        i += 1
+	while 1:
+		move = next(moves)
+		iteration += 1
+		iteration %= len(data)
 
-        # CYCLE DETECTOR
-        if i % (len(JET_PATTERN) * len(ROCKS)) == 0:
-            # cycle can only happen on a multiple of the size of each problem inputs
-            skyline = [max([y for (xc, y) in chamber if xc == x]) for x in range(7)]
-            logger.critical(f"testing cycle....")
-            if len(set(skyline)) == 1:
-                logger.critical(f"top line is a flat line, like initial state!")
-                ICYCLE = i
-                YCYCLE = YMAX
+		if move == '<' and not collision(rock, 'l'):
+			left(rock)
+			# eprint('Move left', rock)
+		elif move == '>' and not collision(rock, 'r'):
+			right(rock)
+			# eprint('Move right', rock)
+		# else:
+			# eprint('No lateral move')
 
-    cycles_to_res = 1_000_000_000 // ICYCLE
-    remaining = 1_000_000_000 % ICYCLE
-    chamber = set([(x, 0) for x in range(7)])
-    for i in range(remaining):
-        add_rock(i)
+		# dump()
 
-    return max([y for (x, y) in chamber]) + cycles_to_res * YCYCLE
+		if collision(rock, 'd'):
+			space.update(map(tuple, rock))
+			topy = max(map(itemgetter(1), space))
 
+			if skipped is None and topy > 200:
+				topchunk = []
+				for x, y in space:
+					if y >= topy - 100:
+						topchunk.append((x, topy - y))
 
-"""
-Use script args to execute the right function solve1 / solve2, with the right logging level (only activated on test inputs)
-  - python dayXX.py 1
-  - python dayXX.py 1t
-  - python dayXX.py 2
-  - python dayXX.py 2t 
-"""
-if __name__ == "__main__":
-    """some logger levels : DEBUG, INFO, WARNING, CRITICAL"""
-    if len(sys.argv) > 1 and sys.argv[1] == "1":
-        logger.setLevel(logging.CRITICAL)
-        JET_PATTERN = Input(DAY).read()
-        res = solve1()
-        print(res)
-    if len(sys.argv) > 1 and sys.argv[1] == "1t":
-        logger.setLevel(logging.WARNING)
-        JET_PATTERN = test_input(DAY).read()
-        res = solve1()
-        print(res)
-    if len(sys.argv) > 1 and sys.argv[1] == "2":
-        logger.setLevel(logging.WARNING)
-        JET_PATTERN = Input(DAY).read()
-        res = solve2((Input(DAY).read()))
-        print(res)
-    if len(sys.argv) > 1 and sys.argv[1] == "2t":
-        logger.setLevel(logging.WARNING)
-        JET_PATTERN = test_input(DAY).read()
-        res = solve2((test_input(DAY).read()))
-        print(res)
+				state = (tuple(sorted(topchunk)), iteration, rocktype)
+
+				if state in previous:
+					nn, yy = previous[state]
+					deltay = topy - yy
+					deltan = n - nn
+					# eprint('pattern repeats every', deltan, 'rocks going up', deltay)
+					# eprint('jump fom rock', n, 'to', totrocks - n)
+					# 1963 to 999999998037
+
+					steps = (totrocks - n) // deltan
+					skipped = deltay * steps
+					n += deltan * steps
+
+				previous[state] = (n, topy)
+
+			break
+
+		down(rock)
+
+		# eprint('Move down', rock)
+		# dump()
+
+	n += 1
+
+topy += skipped
+
+advent.print_answer(2, topy)
