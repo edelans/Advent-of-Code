@@ -180,42 +180,44 @@ def solve1():
 
 def solve2(data):
     """Solves part2."""
-    global ICYCLE, YCYCLE, chamber
-    previous = set()
+    global YMAX
+    cycle = False
+    previous = {}
     i = 0
-    while ICYCLE < 1:
+    i_target = 1_000_000_000_000
+    sample_size = 100
+
+    while i < i_target:
         if i % 1000 == 0:
             logger.warning(f"reached i = {i}")
         add_rock(i)
         i += 1
 
         # CYCLE DETECTOR
-        if i % (len(JET_PATTERN) * len(ROCKS)) == 0:
-            dump = mdump_lasty(chamber, 200)
-            logger.warning(dump)
-            if dump in previous:
-                print("CYCLE DETECTED")
-                return
-            else:
-                previous.add(dump)
-            # cycle can only happen on a multiple of the size of each problem inputs
-            skyline = [max([y for (xc, y) in chamber if xc == x]) for x in range(7)]
-            logger.critical(f"testing cycle at i = {i}")
-            if len(set(skyline)) == 1:
-                logger.critical(f"top line is a flat line, like initial state!")
-                ICYCLE = i
-                YCYCLE = YMAX
+        if not cycle:
+            if i > sample_size and i % (len(JET_PATTERN) * len(ROCKS)) == 0:
+                # cycle length is necessarily a multiple of the size of each problem inputs
+                dump = mdump_lasty(chamber, sample_size)
+                #logger.warning(dump)
+                if dump in previous:
+                    print("CYCLE DETECTED")
+                    cycle = True
+                    i_cycle_start = previous[dump][0]
+                    y_cycle_start = previous[dump][1]
+                    cycle_length = i - i_cycle_start
+                    cycle_y_size = YMAX - y_cycle_start
 
-    cycles_to_res = 1_000_000_000 // ICYCLE
-    remaining = 1_000_000_000 % ICYCLE
-    chamber = set([(x, 0) for x in range(7)])
-    YMAX = 0
-    for i in range(remaining):
-        add_rock(i)
+                    n = (i_target - i) // cycle_length
+                    print(f"fast forward {n} cycles of length {cycle_length} and height {cycle_y_size}, adding {n * cycle_length} to i and {n * cycle_y_size} to YMAX")
+                    i += n * cycle_length
+                    y_cycles = n * cycle_y_size
+                else:
+                    previous[dump] = i, YMAX
+    return YMAX + y_cycles
 
-    return YMAX + cycles_to_res * YCYCLE
-
-
+    # 1514286628
+    # 1514285716108
+    # 1514285714288
 """
 Use script args to execute the right function solve1 / solve2, with the right logging level (only activated on test inputs)
   - python dayXX.py 1
