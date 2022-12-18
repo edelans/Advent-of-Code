@@ -163,7 +163,11 @@ def add_rock(i):
                 return
         logger.info(f"rock_coords are {rock_coords}")
     chamber.update(set(rock_coords))
-    YMAX = max(map(itemgetter(1), chamber))
+    ymax_rock = max(map(itemgetter(1), rock_coords))
+
+    # YMAX = max(map(itemgetter(1), chamber)) makes add_rock in O(1) instead of 0(len(chamber)) !!!
+    if ymax_rock > YMAX:
+        YMAX = ymax_rock
     return
 
 
@@ -188,7 +192,7 @@ def solve2(data):
     sample_size = 100
 
     while i < i_target:
-        if i % 1000 == 0:
+        if i % 100_000 == 0:
             logger.warning(f"reached i = {i}")
         add_rock(i)
         i += 1
@@ -218,6 +222,7 @@ def solve2(data):
     # 1514286628
     # 1514285716108
     # 1514285714288
+    # 1572093023267
 """
 Use script args to execute the right function solve1 / solve2, with the right logging level (only activated on test inputs)
   - python dayXX.py 1
