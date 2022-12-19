@@ -47,12 +47,12 @@ def load_bp(data):
 
 
 def quality_level(blueprint_id):
-    ql = blueprint_id * max_geodes(24, blueprint_id, 0,0, 0, 0, 1, 0, 0, 0)
+    ql = blueprint_id * max_geodes(24, blueprint_id, 0, 0, 0, 0, 1, 0, 0, 0)
     print(f"quality level for blueprint {blueprint_id} is {ql} ")
     return ql
 
 
-
+@lru_cache(maxsize=None)
 def max_geodes(T, blueprint, ore, clay, obsidian, geode, ore_robot, clay_robot, obsidian_robot, geode_robot):
     if T == 0:
         return geode
@@ -105,7 +105,7 @@ def max_geodes(T, blueprint, ore, clay, obsidian, geode, ore_robot, clay_robot, 
 
     # build a clay robot
     # Each clay robot costs 2 ore.
-    if (ore >= bp["cost_obsidian_rbt__clay"]):
+    if (ore >= bp["cost_clay_rbt"]):
         options.append((T - 1,
                         blueprint,
                         ore + ore_robot - bp["cost_clay_rbt"],
