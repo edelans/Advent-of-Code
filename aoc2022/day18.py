@@ -92,15 +92,11 @@ def solve2(data):
             fs = free_sides.copy()
             intersect = False
             for s in fs:
-
-
-
-                if len(edges & set([si for si in s])) > 0:
+                if any([(e in edges) for e in s]):
                     free_sides.remove(s)
                     edges.update([edge for edge in s])
                     surface.add(s)
                     intersect = True
-
         result[side] = len(surface)
 
     return result
