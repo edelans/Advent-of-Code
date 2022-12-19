@@ -46,9 +46,10 @@ def load_bp(data):
     return
 
 
-def quality_level(blueprint_id):
-    ql = blueprint_id * max_geodes(24, blueprint_id, 0,0, 0, 0, 1, 0, 0, 0)
-    print(f"quality level for blueprint {blueprint_id} is {ql} ")
+def quality_level(blueprint_id, t):
+    maxg = max_geodes(t, blueprint_id, 0,0, 0, 0, 1, 0, 0, 0)
+    ql = blueprint_id * maxg
+    print(f"blueprint {blueprint_id} can open {maxg} geodes in {t}min, reaching a quality level of {ql} ")
     return ql
 
 
@@ -60,54 +61,49 @@ def max_geodes(T, blueprint, ore, clay, obsidian, geode, ore_robot, clay_robot, 
     bp = BLUEPRINTS[blueprint]
     options = []
 
-
-
     # build a geode robot
     # Each geode robot costs 3 ore and 12 obsidian.
     # if I can build a geode robot, it's definitely the only option I should consider
     if (ore >= bp["cost_geode_rbt__ore"] and obsidian >= bp["cost_geode_rbt__obsidian"]):
         options.append((T-1, blueprint, ore + ore_robot - bp["cost_geode_rbt__ore"], clay + clay_robot, obsidian + obsidian_robot - bp["cost_geode_rbt__obsidian"], geode + geode_robot, ore_robot, clay_robot, obsidian_robot, geode_robot+1))
 
-
-
-    else:
-
-        # do nothing
-        options.append((T-1, blueprint, ore + ore_robot, clay+clay_robot, obsidian+obsidian_robot, geode + geode_robot, ore_robot, clay_robot, obsidian_robot, geode_robot))
-
-        # build an obsidian robot
-        if obsidian_robot <= bp["cost_geode_rbt__obsidian"] and (
+    # build an obsidian robot
+    elif obsidian_robot <= bp["cost_geode_rbt__obsidian"] and (
                 ore >= bp["cost_obsidian_rbt__ore"] and clay >= bp["cost_obsidian_rbt__clay"]):
             options.append((T - 1, blueprint, ore + ore_robot - bp["cost_obsidian_rbt__ore"],
                             clay + clay_robot - bp["cost_obsidian_rbt__clay"],
                             obsidian + obsidian_robot, geode + geode_robot, ore_robot,
                             clay_robot, obsidian_robot + 1, geode_robot))
 
+    else:
+
+        # do nothing
+        options.append((T-1, blueprint, ore + ore_robot, clay+clay_robot, obsidian+obsidian_robot, geode + geode_robot, ore_robot, clay_robot, obsidian_robot, geode_robot))
 
         # build a clay robot
         # Each clay robot costs 3 ore.
         # it's useless to produce in 1 step more than the max that you can consume in one step
-        if (ore >= bp["cost_obsidian_rbt__clay"] and clay_robot<= bp["cost_obsidian_rbt__clay"]):
+        if (ore >= bp["cost_clay_rbt"] and clay_robot<= bp["cost_obsidian_rbt__clay"]):
             options.append((T - 1, blueprint, ore + ore_robot - bp["cost_clay_rbt"], clay + clay_robot,
                             obsidian + obsidian_robot, geode + geode_robot, ore_robot,
                             clay_robot + 1, obsidian_robot, geode_robot))
         # build a ore robot
         # it's useless to produce in 1 step more than the max that you can consume in one step
-        if (ore >= bp["cost_ore_rbt"]) and ore_robot<= bp["max_ore_cost"]:
+        if (ore >= bp["cost_ore_rbt"]) and ore_robot <= bp["max_ore_cost"]:
             options.append((T - 1, blueprint,
                             ore + ore_robot - bp["cost_ore_rbt"], clay + clay_robot,
                             obsidian + obsidian_robot, geode + geode_robot, ore_robot +1,
                             clay_robot, obsidian_robot, geode_robot))
 
 
-    print(options)
+    #print(options)
     return max([max_geodes(*o) for o in options])
 
 
 def solve1(data):
     """Solves part 1."""
     load_bp(data)
-    return sum([quality_level(k) for k in BLUEPRINTS.keys()])
+    return sum([quality_level(k,24) for k in BLUEPRINTS.keys()])
 
 
 
