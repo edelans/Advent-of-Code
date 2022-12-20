@@ -53,7 +53,28 @@ def solve1(data):
 
 def solve2(data):
     """Solves part2."""
-    pass
+    l = []
+    for line in data.splitlines():
+        l.append(int(line) * 811589153)
+    print(f"input has {len(l)} values, and {len(set(l))} unique values.")
+    size = len(l)
+
+    # there a re duplicate values in input, we need to introduce an id for each value
+    list_with_ids = [*enumerate(l)]  # l = [1, 2, -3, 3, -2, 0, 4] would yield
+    # [(0, 1), (1, 2), (2, -3), (3, 3), (4, -2), (5, 0), (6, 4)]
+    print(list_with_ids)
+
+    original_list_with_ids = (
+        list_with_ids.copy()
+    )  # storing an independant copy so we can iterate on it while modifying list_with_ids
+
+    for _ in range(10):
+        for id, i in original_list_with_ids:
+            idx = list_with_ids.index((id, i))
+            list_with_ids.pop(idx)
+            list_with_ids.insert((idx + i) % (size - 1), (id, i))
+    res = [x for _, x in list_with_ids]
+    return sum([res[(res.index(0) + 1000 * p) % size] for p in [1, 2, 3]])
 
 
 """
