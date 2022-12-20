@@ -29,48 +29,26 @@ DAY = os.path.basename(__file__)[3:5]
 
 def solve1(data):
     """Solves part 1."""
-    seq = deque([])
+    l = []
     for line in data.splitlines():
-        seq.append(int(line))
-    iseq = list(seq)  # initial sequence, in an independant copy
-    size = len(iseq)
+        l.append(int(line))
+    print(f"input has {len(l)} values, and {len(set(l))} unique values.")
+    size = len(l)
 
-    for i in iseq:
-        # print(f"\nmoving {i}:")
-        idx = seq.index(i)
-        seq.rotate(-idx)
-        seq.popleft()
-        seq.rotate(-i)
-        seq.appendleft(i)
-        # print(f"seq is: {list(seq)}")
+    # there a re duplicate values in input, we need to introduce an id for each value
+    list_with_ids = [*enumerate(l)]  # l = [1, 2, -3, 3, -2, 0, 4] would yield
+    # [(0, 1), (1, 2), (2, -3), (3, 3), (4, -2), (5, 0), (6, 4)]
 
-    seq.rotate(-seq.index(0))
-    print(f"seq is: {list(seq)}")
-    return (
-        seq[1000 % size],
-        seq[2000 % size],
-        seq[3000 % size],
-        seq[1000 % size] + seq[2000 % size] + seq[3000 % size],
-    )
-    # 11092 too high
-    # -16196 no
+    original_list_with_ids = (
+        list_with_ids.copy()
+    )  # storing an independant copy so we can iterate on it while modifying list_with_ids
 
-
-"""
-    >>> from collections import deque
-    >>> circle = deque([1,2,3,4])
-
-    >>> circle.rotate(1)
-    >>> circle
-    deque([4, 1, 2, 3])
-
-    >>> circle.pop()
-    3
-
-    >>> circle.append(5)
-    >>> circle
-    deque([4, 1, 2, 5])
-"""
+    for id, i in original_list_with_ids:
+        idx = list_with_ids.index((id, i))
+        list_with_ids.pop(idx)
+        list_with_ids.insert((idx + i) % (size - 1), (id, i))
+    res = [x for _, x in list_with_ids]
+    return sum([res[(res.index(0) + 1000 * p) % size] for p in [1, 2, 3]])
 
 
 def solve2(data):
