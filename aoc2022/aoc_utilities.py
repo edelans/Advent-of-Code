@@ -1,5 +1,15 @@
 import re
 from itertools import product
+import operator
+
+OPS = {
+    "+": operator.add,
+    "-": operator.sub,
+    "*": operator.mul,
+    "/": operator.truediv,
+    "%": operator.mod,
+    "^": operator.xor,
+}
 
 
 def parse_words(text):
