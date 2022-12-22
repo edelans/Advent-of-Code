@@ -4,6 +4,7 @@
 import os
 import sys
 import logging
+from copy import deepcopy
 from aoc_utilities import Input, test_input, OPS
 
 """
@@ -46,9 +47,11 @@ def monkey_number(monkey_name):
     if "result" in MONKEYS[monkey_name].keys():
         return MONKEYS[monkey_name]["result"]
     else:
-        res = MONKEYS[monkey_name]["op"](
-            monkey_number(MONKEYS[monkey_name]["a"]),
-            monkey_number(MONKEYS[monkey_name]["b"]),
+        res = int(
+            MONKEYS[monkey_name]["op"](
+                monkey_number(MONKEYS[monkey_name]["a"]),
+                monkey_number(MONKEYS[monkey_name]["b"]),
+            )
         )
         MONKEYS[monkey_name]["result"] = res
         return res
@@ -64,18 +67,33 @@ def solve2(data):
     """Solves part2."""
     global MONKEYS
     load(data)
-    MONKEYS[monkey_name]["humn"] = 0
-    FRESH_MONKEYS = MONKEYS.copy()
+
+    FRESH_MONKEYS = deepcopy(MONKEYS)
+    """
+    MONKEYS["humn"]["result"] = "aze"
     print(
         f"MONKEYS['root']['a'] is {MONKEYS['root']['a']}, with value {monkey_number(MONKEYS['root']['a'])}"
     )
-    while monkey_number(MONKEYS["root"]["a"]) != monkey_number(MONKEYS["root"]["b"]):
-        print("test")
-        new_humn = MONKEYS[monkey_name]["humn"] + 1
-        MONKEYS = FRESH_MONKEYS.copy()
-        MONKEYS[monkey_name]["humn"] = new_humn
+    print(
+        f"MONKEYS['root']['b'] is {MONKEYS['root']['b']}, with value {monkey_number(MONKEYS['root']['b'])}"
+    )
+    """
+    # monkey_number(MONKEYS['root']['a']) gives an error while monkey_number(MONKEYS['root']['b']) gives 150
 
-    return MONKEYS[monkey_name]["humn"]
+    # reset monkeys
+    new_humn = 6400000000000
+    MONKEYS["humn"]["result"] = new_humn
+    print(int(monkey_number(MONKEYS["root"]["a"])))
+
+    while int(monkey_number(MONKEYS["root"]["a"])) < 42130890593816:
+        new_humn /= 2
+        if new_humn % 1_000 == 0:
+            print(new_humn)
+        MONKEYS = deepcopy(FRESH_MONKEYS)
+        MONKEYS["humn"]["result"] = new_humn
+
+    print("found humn value to get equality: ")
+    return new_humn
 
 
 """
