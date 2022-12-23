@@ -131,7 +131,56 @@ def solve1(data):
 
 def solve2(data):
     """Solves part2."""
-    pass
+
+    ground = parser(data)
+    directions = ["N", "S", "W", "E"]
+    d = 0
+
+    print("initial state: ")
+    print(mdump(ground))
+    print()
+
+    # first half
+    # each Elf considers the eight positions adjacent to themself.
+    #   - If no other Elves are in one of those eight positions, the Elf does not do anything during this round
+    #   - Otherwise, the Elf looks in each of four directions in the following order and proposes moving one step in the first valid direction:
+
+    for r in range(100_000_000_000):
+        moving = False
+        moves = {}
+        for e in ground:
+            neighbors = neighbors_all(e)
+            if any(n in ground for n in neighbors):
+                # there is at least one elf around, add a suggested move
+                for i in range(4):
+                    dx, dy = delta_dir(directions[(d + i) % 4])
+                    if not any(
+                        [
+                            x in ground
+                            for x in move_check(e[0], e[1], directions[(d + i) % 4])
+                        ]
+                    ):
+                        moves[e] = e[0] + dx, e[1] + dy
+                        break
+
+        # second half
+        # Simultaneously, each Elf moves to their proposed destination tile if they were the only Elf to propose moving to that position.
+        # If two or more Elves propose moving to the same position, none of those Elves move.
+        for source, target in moves.items():
+            if len(set([k for k, v in moves.items() if v == target])) == 1:
+                ground.remove(source)
+                ground.add(target)
+                moving = True
+
+        # the first direction the Elves considered is moved to the end of the list of directions.
+        d = (d + 1) % 4
+
+        # print(mdump(ground))
+        # print()
+
+        if not moving:
+            print(f"the first round where no Elf moved was round {r + 1}:")
+            return f"no more moves after {r}"
 
 
 """
