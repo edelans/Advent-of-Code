@@ -107,12 +107,6 @@ def iterate(minutes, pos, up, down, left, right, end, max_x, max_y):
     global CURRENT_MIN
     global CACHE
     logger.info(f"after minute {minutes}, E is at pos {pos}")
-    if pos == end:
-        logger.warning(f"  we found a path in {minutes+1}min!")
-        if minutes < CURRENT_MIN:
-            CURRENT_MIN = minutes
-        up, down, left, right = next_blizzards(max_x, max_y, up, down, left, right)
-        return minutes + 1, up, down, left, right
 
     if minutes + manhattan(pos, end) >= CURRENT_MIN:
         logger.info(
@@ -145,6 +139,12 @@ def iterate(minutes, pos, up, down, left, right, end, max_x, max_y):
     options = []
 
     for n in neighbors_4(pos):
+        if n == end:
+            logger.warning(f"  we found a path in {minutes + 1}min!")
+            up, down, left, right = next_blizzards(max_x, max_y, up, down, left, right)
+            if minutes < CURRENT_MIN:
+                CURRENT_MIN = minutes + 1
+            return minutes + 1, up, down, left, right
 
         if 1 <= n[0] <= max_x and 1 <= n[1] <= max_y:
             if n not in all_blizzards:
@@ -174,13 +174,13 @@ def solve1(data):
     start, end, max_x, max_y, up, down, left, right = parser(data)
     up, down, left, right = next_blizzards(max_x, max_y, up, down, left, right)
     return iterate(
-        1,
-        (start[0], start[1] + 1),
+        0,
+        start,
         up,
         down,
         left,
         right,
-        (end[0], end[1] - 1),
+        end,
         max_x,
         max_y,
     )[0]
@@ -194,49 +194,45 @@ def solve2(data):
     up, down, left, right = next_blizzards(max_x, max_y, up, down, left, right)
 
     min1, up, down, left, right = iterate(
-        1,
-        (start[0], start[1] + 1),
+        0,
+        start,
         up,
         down,
         left,
         right,
-        (end[0], end[1] - 1),
+        end,
         max_x,
         max_y,
     )
     logger.warning(f"part 1 took {min1}")
-    print(dump(max_x, max_y, up, down, left, right, end))
+    # print(dump(max_x, max_y, up, down, left, right, end))
 
-    # TODO : assumption that I can do the first move right at the first minute is not good. Sometimes I need to wait in initial position (on the edge)...
-
-    up, down, left, right = next_blizzards(max_x, max_y, up, down, left, right)
-    print(dump(max_x, max_y, up, down, left, right, (end[0], end[1] - 1)))
     CACHE = set()
     CURRENT_MIN = float("inf")
     min2, up, down, left, right = iterate(
-        1,
-        (end[0], end[1] - 1),
+        0,
+        end,
         up,
         down,
         left,
         right,
-        (start[0], start[1] + 1),
+        start,
         max_x,
         max_y,
     )
     logger.warning(f"part 2 took {min2}")
+    # print(dump(max_x, max_y, up, down, left, right, end))
 
-    up, down, left, right = next_blizzards(max_x, max_y, up, down, left, right)
     CACHE = set()
     CURRENT_MIN = float("inf")
     min3, up, down, left, right = iterate(
-        1,
-        (start[0], start[1] + 1),
+        0,
+        start,
         up,
         down,
         left,
         right,
-        (end[0], end[1] - 1),
+        end,
         max_x,
         max_y,
     )
