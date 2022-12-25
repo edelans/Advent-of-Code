@@ -4,7 +4,9 @@
 import os
 import sys
 import logging
-import math
+from functools import lru_cache
+
+
 from aoc_utilities import Input, test_input, neighbors_4
 
 """
@@ -86,6 +88,7 @@ def dump(max_x, max_y, up, down, left, right, pos):
     return dump
 
 
+@lru_cache(maxsize=None)
 def next_blizzards(max_x, max_y, up, down, left, right):
     new_up, new_down, new_left, new_right = set(), set(), set(), set()
     for (i, j) in up:
