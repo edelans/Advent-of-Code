@@ -40,7 +40,6 @@ def solve1(data):
             circle.rotate(-nb)
         if d == "L":
             circle.rotate(+nb)
-
         if circle[0] == 0:
             counter += 1
     logger.info(
