@@ -56,7 +56,23 @@ def solve1(data):
 
 def solve2(data):
     """Solves part2."""
-    pass
+    circle = deque(range(0,100))
+    circle.rotate(-50) # rotate to put 50 at the beginning of the circle
+    logger.info(f"The dial points at {circle[0]}.")
+    counter=0
+    for line in data.splitlines():
+        (d,nb) = (line[0], int(line[1:]))
+        logger.info(f"The dial points at {circle[0]}. Will rotate to the {d} by {nb}")
+        for i in range(nb):
+            if d == "R":
+                circle.rotate(-1)
+            if d == "L":
+                circle.rotate(+1)
+            if circle[0]==0:
+                counter += 1
+                logger.info(f"We have seen the number 0!")
+    logger.info(f"The dial points at {circle[0]}. We have seen {counter} times the number 0.")
+    return counter 
 
 
 """
