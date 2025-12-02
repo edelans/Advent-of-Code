@@ -28,7 +28,17 @@ DAY = os.path.basename(__file__)[3:5]
 
 def solve1(data):
     """Solves part 1."""
-    pass
+    invalid_sum = 0
+    for r in data.split(","):
+        left, right = int(r.split("-")[0]), int(r.split("-")[1])
+        logger.info(f"Checking range: {left} to {right}")
+        for id in range(left, right + 1):
+            logger.info(f"Checking id: {id}")
+            if len(str(id)) % 2 == 0:
+                if str(id)[0:len(str(id))//2] == str(id)[len(str(id))//2:]:
+                    invalid_sum+=id
+                    logger.info(f"Invalid id: {id}")
+    return invalid_sum
 
 
 def solve2(data):
