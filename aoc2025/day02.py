@@ -34,10 +34,7 @@ def solve1(data):
         logger.info(f"Checking range: {left} to {right}")
         for id in range(left, right + 1):
             logger.info(f"Checking id: {id}")
-            if (
-                len(str(id)) % 2 == 0
-                and str(id)[0 : len(str(id)) // 2] == str(id)[len(str(id)) // 2 :]
-            ):
+            if str(id)[0 : len(str(id)) // 2] == str(id)[len(str(id)) // 2 :]:
                 invalid_sum += id
                 logger.info(f"Invalid id: {id}")
     return invalid_sum
