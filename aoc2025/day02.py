@@ -35,8 +35,8 @@ def solve1(data):
         for id in range(left, right + 1):
             logger.info(f"Checking id: {id}")
             if len(str(id)) % 2 == 0:
-                if str(id)[0:len(str(id))//2] == str(id)[len(str(id))//2:]:
-                    invalid_sum+=id
+                if str(id)[0 : len(str(id)) // 2] == str(id)[len(str(id)) // 2 :]:
+                    invalid_sum += id
                     logger.info(f"Invalid id: {id}")
     return invalid_sum
 
@@ -44,14 +44,14 @@ def solve1(data):
 def chunksize(n: int) -> list[int]:
     cs = set()
     l = len(str(n))
-    for i in range(1,l//2+1):
+    for i in range(1, l // 2 + 1):
         if l % i == 0:
             cs.add(i)
     return cs
 
 
 def chunks(s: str, size: int) -> list[str]:
-    return [s[i:i + size] for i in range(0, len(s), size)]
+    return [s[i : i + size] for i in range(0, len(s), size)]
 
 
 def solve2(data):
@@ -66,10 +66,12 @@ def solve2(data):
             logger.info(f"chunksize: {cs}")
             if cs:
                 for l in cs:
-                    logger.info(f"Checking chunk size: {l}, set of chunks is {set(chunks(str(id), l))}")
-                    if len(set(chunks(str(id), l))) == 1:                    
+                    logger.info(
+                        f"Checking chunk size: {l}, set of chunks is {set(chunks(str(id), l))}"
+                    )
+                    if len(set(chunks(str(id), l))) == 1:
                         logger.info(f"❌ Invalid id: {id}")
-                        invalid_sum+=id
+                        invalid_sum += id
                         break
     return invalid_sum
 
