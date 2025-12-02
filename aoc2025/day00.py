@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """This script solves puzzles of https://adventofcode.com/"""
 
+import logging
 import os
 import sys
-import logging
+
 from aoc_utilities import Input, test_input
 
 """
 Logger config
-  use logger.ingo("") instead of print statement
+  use logger.info("") instead of print statement
   those messages will be displayed while running the code on testing sets
   but not displayed while running on real puzzle inputs
   note: when you want to avoid logging, 
