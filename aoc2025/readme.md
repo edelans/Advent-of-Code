@@ -8,7 +8,7 @@ Experiment with AI IDEs.
 
 # Repos to watch for instpiration
 
-- https://github.com/mebeim/aoc/tree/master/2021
+- https://github.com/jimm89/AdventOfCode2025/blob/main/README.md
 
 # Learnings
 
