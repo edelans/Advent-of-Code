@@ -41,9 +41,37 @@ def solve1(data):
     return invalid_sum
 
 
+def chunksize(n: int) -> list[int]:
+    cs = set()
+    l = len(str(n))
+    for i in range(1,l//2+1):
+        if l % i == 0:
+            cs.add(i)
+    return cs
+
+
+def chunks(s: str, size: int) -> list[str]:
+    return [s[i:i + size] for i in range(0, len(s), size)]
+
+
 def solve2(data):
     """Solves part2."""
-    pass
+    invalid_sum = 0
+    for r in data.split(","):
+        left, right = int(r.split("-")[0]), int(r.split("-")[1])
+        logger.info(f"\nChecking range: {left} to {right}")
+        for id in range(left, right + 1):
+            logger.info(f"Checking id: {id}")
+            cs = chunksize(id)
+            logger.info(f"chunksize: {cs}")
+            if cs:
+                for l in cs:
+                    logger.info(f"Checking chunk size: {l}, set of chunks is {set(chunks(str(id), l))}")
+                    if len(set(chunks(str(id), l))) == 1:                    
+                        logger.info(f"❌ Invalid id: {id}")
+                        invalid_sum+=id
+                        break
+    return invalid_sum
 
 
 """
