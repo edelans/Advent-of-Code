@@ -5,7 +5,7 @@ import logging
 import os
 import sys
 
-from aoc_utilities import Input, test_input
+from aoc_utilities import Input, test_input, timer_func
 
 """
 Logger config
@@ -26,6 +26,7 @@ logger.addHandler(handler)
 DAY = os.path.basename(__file__)[3:5]
 
 
+@timer_func
 def solve1(data):
     """Solves part 1."""
     invalid_sum = 0
@@ -53,6 +54,7 @@ def chunks(s: str, size: int) -> list[str]:
     return [s[i : i + size] for i in range(0, len(s), size)]
 
 
+@timer_func
 def solve2(data):
     """Solves part2."""
     invalid_sum = 0
