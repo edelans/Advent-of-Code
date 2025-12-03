@@ -24,7 +24,7 @@ logger.addHandler(handler)
 DAY = os.path.basename(__file__)[3:5]
 
 
-def largest_joltage(bank):
+def largest_joltage(bank: str) -> int:
     batt1 = int(bank[0])
     batt2 = int(bank[1])
     logger.info(f"\nComputing largest joltage for {bank}")
@@ -38,7 +38,7 @@ def largest_joltage(bank):
     return int(str(batt1) + str(batt2))
 
 
-def _test_largest_joltage():
+def _test_largest_joltage() -> None:
     cases = (
         ("987654321111111", 98),
         ("811111111111119", 89),
@@ -53,7 +53,7 @@ def _test_largest_joltage():
 
 
 @timer_func
-def solve1(data):
+def solve1(data: str):
     """Solves part 1."""
     acc = 0
     for bank in data.splitlines():
@@ -61,7 +61,7 @@ def solve1(data):
     return acc
 
 
-def largest_joltage_generic(bank, target_joltage_size):
+def largest_joltage_generic(bank: str, target_joltage_size: int) -> int:
     joltage = ""
     available_bank = bank
     logger.info(
@@ -94,7 +94,7 @@ def add_battery(
     return newbank, joltage, target_joltage_size
 
 
-def _test_largest_joltage12():
+def _test_largest_joltage12() -> None:
     cases = (
         ("987654321111111", 987654321111),
         ("811111111111119", 811111111119),
@@ -109,7 +109,7 @@ def _test_largest_joltage12():
 
 
 @timer_func
-def solve2(data):
+def solve2(data: str):
     """Solves part2."""
     acc = 0
     target_joltage_size = 12
