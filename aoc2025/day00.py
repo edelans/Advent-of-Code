@@ -48,6 +48,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "1t":
         logger.setLevel(logging.INFO)
         res = solve1(test_input(DAY).read())
+        expected = XXX  # TODO: replace with expected value
+        assert res == expected, f"Expected {expected}, got {res}"
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "1":
         logger.setLevel(logging.WARNING)
@@ -56,6 +58,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "2t":
         logger.setLevel(logging.INFO)
         res = solve2(test_input(DAY).read())
+        expected = XXX  # TODO: replace with expected value
+        assert res == expected, f"Expected {expected}, got {res}"
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "2":
         logger.setLevel(logging.WARNING)
