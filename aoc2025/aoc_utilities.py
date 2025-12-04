@@ -12,7 +12,7 @@ OPS = {
 }
 
 
-def parse_words(text):
+def parse_words(text: str) -> list[str]:
     "All the words in text"
     return text.split(",")
 
@@ -29,10 +29,12 @@ def test_input(day):
     return open(filename)
 
 
-def neighbors_all(point):
+def neighbors_all(point: tuple[int, ...]) -> set[tuple[int, ...]]:
     """returns a set of all the neighboring positions of the input point
     whatever the number of dimentions
     ⚠️ Be careful as these positions can be outside your map ⚠️
+    💡 Use a set intersection to remove out of bounds positions
+
 
     Examples :
     >>> import aoc_utilities
@@ -48,10 +50,10 @@ def neighbors_all(point):
     80"""
 
     ranges = ((c - 1, c, c + 1) for c in point)
-    return set(product(*ranges)) - set([point])
+    return set(product(*ranges)) - {point}
 
 
-def neighbors_4(pos):
+def neighbors_4(pos: tuple[int, int]) -> list[tuple[int, int]]:
     """
     returns positions of 4 neighbors : up, down, left, right
     ⚠️ Be careful as these positions can be outside your map ⚠️
@@ -64,22 +66,22 @@ def neighbors_4(pos):
     ]
 
 
-def mprint(maping, min_half_size=10):
+def mprint(maping: dict[tuple[int, int], str | int], min_half_size: int = 10) -> None:
     """
     Helper function to print a map
     when the map is a dictionary, with keys as tuples of coordinates (1,2)
     no need to have all the coordinates in the keys
     """
-    xmax = max(max([int(i) for (i, j) in maping.keys()]), min_half_size)
-    xmin = min(min([int(i) for (i, j) in maping.keys()]), -min_half_size)
-    ymax = max(max([int(j) for (i, j) in maping.keys()]), min_half_size)
-    ymin = min(min([int(j) for (i, j) in maping.keys()]), -min_half_size)
+    xmax = max(max([int(i) for (i, j) in maping]), min_half_size)
+    xmin = min(min([int(i) for (i, j) in maping]), -min_half_size)
+    ymax = max(max([int(j) for (i, j) in maping]), min_half_size)
+    ymin = min(min([int(j) for (i, j) in maping]), -min_half_size)
     for y in range(ymax, ymin - 1, -1):
         print("".join([str(maping.get((x, y), ".")) for x in range(xmin, xmax + 1)]))
     return
 
 
-def sign(x):
+def sign(x: int | float) -> int:
     """
     note : sometimes it can be more useful to use math.copysign()
     see https://stackoverflow.com/a/1986718/1570104
@@ -91,7 +93,7 @@ def timer_func(func):
     # This function shows the execution time of
     # the function object passed
     # (to be used as a wraper)
-    def wrap_func(*args, **kwargs):
+    def wrap_func(*args: object, **kwargs: object) -> object:
         t1 = time.time()
         result = func(*args, **kwargs)
         t2 = time.time()
