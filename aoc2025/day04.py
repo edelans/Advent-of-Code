@@ -5,7 +5,7 @@ import logging
 import os
 import sys
 
-from aoc_utilities import Input, test_input, timer_func
+from aoc_utilities import Input, neighbors_all, test_input, timer_func
 
 """
 Logger config
@@ -24,10 +24,33 @@ logger.addHandler(handler)
 DAY = os.path.basename(__file__)[3:5]
 
 
+def parser(data):
+    grid = set()
+    for y, line in enumerate(data.splitlines()):
+        for x, c in enumerate(line.strip()):
+            if c == "@":
+                grid.add((x, y))
+    return grid
+
+
 @timer_func
 def solve1(data):
     """Solves part 1."""
-    pass
+    grid = parser(data)
+    logger.info(f"grid: {grid}")
+    accessible_rolls = 0
+    for roll in grid:
+        neighbors = neighbors_all(roll)
+        neighboring_roll_count = 0
+        for neighbor in neighbors:
+            if neighbor in grid:
+                logger.info(f"neighboring roll at ({roll})")
+                neighboring_roll_count += 1
+        if neighboring_roll_count < 4:
+            accessible_rolls += 1
+            logger.info(f"accessible roll at {roll}")
+
+    return accessible_rolls
 
 
 @timer_func

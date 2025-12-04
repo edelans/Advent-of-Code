@@ -1,6 +1,6 @@
-import re
+import operator
+import time
 from itertools import product
-import operator, time
 
 OPS = {
     "+": operator.add,
@@ -19,19 +19,20 @@ def parse_words(text):
 
 def Input(day):
     "Open this day's input file."
-    filename = "./input_files/input{}.txt".format(day)
+    filename = f"./input_files/input{day}.txt"
     return open(filename)
 
 
 def test_input(day):
     "Open this day's test input file"
-    filename = "./input_files/input{}.test.txt".format(day)
+    filename = f"./input_files/input{day}.test.txt"
     return open(filename)
 
 
 def neighbors_all(point):
     """returns a set of all the neighboring positions of the input point
     whatever the number of dimentions
+    ⚠️ Be careful as these positions can be outside your map ⚠️
 
     Examples :
     >>> import aoc_utilities
@@ -53,7 +54,7 @@ def neighbors_all(point):
 def neighbors_4(pos):
     """
     returns positions of 4 neighbors : up, down, left, right
-    Be careful as these positions can be outside your map
+    ⚠️ Be careful as these positions can be outside your map ⚠️
     """
     return [
         (pos[0] - 1, pos[1]),
