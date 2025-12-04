@@ -24,7 +24,7 @@ logger.addHandler(handler)
 DAY = os.path.basename(__file__)[3:5]
 
 
-def parser(data):
+def parser(data: str) -> set[tuple[int, int]]:
     grid = set()
     for y, line in enumerate(data.splitlines()):
         for x, c in enumerate(line.strip()):
@@ -34,45 +34,46 @@ def parser(data):
 
 
 @timer_func
-def solve1(data):
+def solve1(data: str) -> int:
     """Solves part 1."""
     grid = parser(data)
-    logger.info(f"grid: {grid}")
     accessible_rolls = 0
     for roll in grid:
         neighbors = neighbors_all(roll)
         neighboring_rolls = neighbors & grid
         if len(neighboring_rolls) < 4:
             accessible_rolls += 1
-            logger.info(f"accessible roll at {roll}")
 
     return accessible_rolls
 
 
-def remove_rolls(grid):
-    # we need to copy the list to avoid modifying the set while iterating (which is not allowed)
+def remove_rolls(grid: set[tuple[int, int]]) -> set[tuple[int, int]]:
+    # As it is not allowed to modify a set while iterating on it
+    # we iterate on a "list" copy of the set created by list()
     for roll in list(grid):
         neighbors = neighbors_all(roll)
         neighboring_rolls = neighbors & grid
         if len(neighboring_rolls) < 4:
             grid.remove(roll)
-    return grid, len(grid)
+    return grid
 
 
 @timer_func
-def solve2(data):
+def solve2(data: str) -> int:
     """Solves part2."""
     grid = parser(data)
-    initial_roll_count = len(grid)
-    roll_count = len(grid)
-    logger.info(f"initial roll count: {roll_count}")
-    new_grid, new_roll_count = remove_rolls(grid)
-    while new_roll_count != roll_count:
-        roll_count = new_roll_count
-        new_grid, new_roll_count = remove_rolls(new_grid)
-        logger.info(f"new iteration removed {roll_count - new_roll_count} rolls")
+    initial_count = len(grid)
 
-    return initial_roll_count - roll_count
+    prev_count = initial_count
+    while True:
+        grid = remove_rolls(grid)
+        new_count = len(grid)
+        if new_count == prev_count:
+            break
+        logger.info(f"new iteration removed {prev_count - new_count} rolls")
+        prev_count = new_count
+
+    return initial_count - new_count
 
 
 """
@@ -87,6 +88,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "1t":
         logger.setLevel(logging.INFO)
         res = solve1(test_input(DAY).read())
+        expected = 13
+        assert res == expected, f"Expected {expected}, got {res}"
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "1":
         logger.setLevel(logging.WARNING)
@@ -95,6 +98,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "2t":
         logger.setLevel(logging.INFO)
         res = solve2(test_input(DAY).read())
+        expected = 43
+        assert res == expected, f"Expected {expected}, got {res}"
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "2":
         logger.setLevel(logging.WARNING)
