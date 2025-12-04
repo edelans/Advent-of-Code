@@ -41,22 +41,38 @@ def solve1(data):
     accessible_rolls = 0
     for roll in grid:
         neighbors = neighbors_all(roll)
-        neighboring_roll_count = 0
-        for neighbor in neighbors:
-            if neighbor in grid:
-                logger.info(f"neighboring roll at ({roll})")
-                neighboring_roll_count += 1
-        if neighboring_roll_count < 4:
+        neighboring_rolls = neighbors & grid
+        if len(neighboring_rolls) < 4:
             accessible_rolls += 1
             logger.info(f"accessible roll at {roll}")
 
     return accessible_rolls
 
 
+def remove_rolls(grid):
+    # we need to copy the list to avoid modifying the set while iterating (which is not allowed)
+    for roll in list(grid):
+        neighbors = neighbors_all(roll)
+        neighboring_rolls = neighbors & grid
+        if len(neighboring_rolls) < 4:
+            grid.remove(roll)
+    return grid, len(grid)
+
+
 @timer_func
 def solve2(data):
     """Solves part2."""
-    pass
+    grid = parser(data)
+    initial_roll_count = len(grid)
+    roll_count = len(grid)
+    logger.info(f"initial roll count: {roll_count}")
+    new_grid, new_roll_count = remove_rolls(grid)
+    while new_roll_count != roll_count:
+        roll_count = new_roll_count
+        new_grid, new_roll_count = remove_rolls(new_grid)
+        logger.info(f"new iteration removed {roll_count - new_roll_count} rolls")
+
+    return initial_roll_count - roll_count
 
 
 """
