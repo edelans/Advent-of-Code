@@ -66,7 +66,9 @@ def solve1(data):
 @timer_func
 def solve2(data):
     """Solves part2."""
-    pass
+    ranges, ingredients = parser(data)
+    ranges = compact_ranges(ranges)
+    return sum(range[1] - range[0] + 1 for range in ranges)
 
 
 """
@@ -91,8 +93,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "2t":
         logger.setLevel(logging.INFO)
         res = solve2(test_input(DAY).read())
-        # expected = XXX
-        # assert res == expected, f"Expected {expected}, got {res}"
+        expected = 14
+        assert res == expected, f"Expected {expected}, got {res}"
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "2":
         logger.setLevel(logging.WARNING)
