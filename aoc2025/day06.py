@@ -4,6 +4,7 @@
 import logging
 import os
 import sys
+from math import prod
 
 from aoc_utilities import Input, test_input, timer_func
 
@@ -24,10 +25,30 @@ logger.addHandler(handler)
 DAY = os.path.basename(__file__)[3:5]
 
 
+def parser(data: str) -> list[tuple[int, int]]:
+    lines = data.strip().splitlines()
+    ops = [op for op in lines[-1].split()]
+    lines = lines[:-1]
+    numbers = []
+    for line in lines:
+        numbers.append([int(n) for n in line.split()])
+
+    return numbers, ops
+
+
 @timer_func
 def solve1(data):
     """Solves part 1."""
-    pass
+    numbers, ops = parser(data)
+    logger.info(f"numbers: {numbers}, \nops: {ops}")
+    acc = 0
+    for x, op in enumerate(ops):
+        if op == "+":
+            acc += sum([n[x] for n in numbers])
+        elif op == "*":
+            acc += prod([n[x] for n in numbers])
+
+    return acc
 
 
 @timer_func
