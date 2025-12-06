@@ -67,6 +67,15 @@ def transpose(matrix: list[list[int]]) -> list[list[int]]:
     return [list(row) for row in zip(*matrix, strict=True)]
 
 
+def process_submatrix(submatrix: list[list], op: str) -> tuple[int, list[int]]:
+    """Process a submatrix by transposing, converting rows to numbers, and applying operator.
+    Returns (result, numbers) for logging purposes."""
+    nbs = [int("".join(row)) for row in transpose(submatrix) if "".join(row).strip()]
+    ops_map = {"+": sum, "*": prod}
+    result = ops_map.get(op, lambda x: 0)(nbs)
+    return result, nbs
+
+
 @timer_func
 def solve2(data):
     numbers, ops = parser2(data)
@@ -79,19 +88,7 @@ def solve2(data):
         if op != " ":
             # deal with the current submatrix
             if current_op:
-                nbs = []
-                for row in transpose(submatrix):
-                    s = ""
-                    for c in row:
-                        s += c
-                    if len(s.strip()) > 0:
-                        nbs.append(int(s))
-
-                inc = 0
-                if current_op == "+":
-                    inc = sum(nbs)
-                elif current_op == "*":
-                    inc = prod(nbs)
+                inc, nbs = process_submatrix(submatrix, current_op)
                 logger.info(
                     f"Computing problem applying {current_op} on {nbs} -> adding {inc} to the result"
                 )
@@ -107,23 +104,12 @@ def solve2(data):
             submatrix[j].append(numbers[j][i])
         logger.info(f"Submatrix: {submatrix}")
 
-    nbs = []
-    for row in transpose(submatrix):
-        s = ""
-        for c in row:
-            s += c
-        if len(s.strip()) > 0:
-            nbs.append(int(s))
-
-    inc = 0
-    if current_op == "+":
-        inc = sum(nbs)
-    elif current_op == "*":
-        inc = prod(nbs)
-    logger.info(
-        f"Computing problem applying {current_op} on {nbs} -> adding {inc} to the result"
-    )
-    acc += inc
+    if current_op:
+        inc, nbs = process_submatrix(submatrix, current_op)
+        logger.info(
+            f"Computing problem applying {current_op} on {nbs} -> adding {inc} to the result"
+        )
+        acc += inc
 
     return acc
 
