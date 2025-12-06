@@ -76,40 +76,40 @@ def process_submatrix(submatrix: list[list], op: str) -> tuple[int, list[int]]:
     return result, nbs
 
 
+def process_and_log(submatrix: list[list], op: str, acc: int) -> int:
+    """Process submatrix, log, and return updated accumulator."""
+    inc, nbs = process_submatrix(submatrix, op)
+    logger.info(
+        f"Computing problem: applying {op} on {nbs} -> adding {inc} to the result"
+    )
+    return acc + inc
+
+
 @timer_func
 def solve2(data):
     numbers, ops = parser2(data)
-    logger.info(f"numbers: {numbers}, \nops: {ops}")
+    logger.debug(f"numbers: {numbers}, \nops: {ops}")
     acc = 0
-    submatrix = [[] for _ in range(len(numbers))]
-    logger.info(f"Submatrix: {submatrix}")
+    submatrix = [[] for _ in numbers]
+    logger.debug(f"Submatrix: {submatrix}")
     current_op = None
+
     for i, op in enumerate(ops):
         if op != " ":
-            # deal with the current submatrix
             if current_op:
-                inc, nbs = process_submatrix(submatrix, current_op)
-                logger.info(
-                    f"Computing problem applying {current_op} on {nbs} -> adding {inc} to the result"
-                )
-                acc += inc
+                acc = process_and_log(submatrix, current_op, acc)
 
-            # reinit submatrix and current_op
             logger.info("\nStarting a new problem.")
-            submatrix = [[] for _ in range(len(numbers))]
+            submatrix = [[] for _ in numbers]
             current_op = op
 
-        for j in range(len(submatrix)):
-            logger.info(f"Adding {numbers[j][i]} to submatrix[{j}]")
-            submatrix[j].append(numbers[j][i])
-        logger.info(f"Submatrix: {submatrix}")
+        for row, subrow in zip(numbers, submatrix, strict=True):
+            logger.debug(f"Adding {row[i]} to submatrix")
+            subrow.append(row[i])
+        logger.debug(f"Submatrix: {submatrix}")
 
     if current_op:
-        inc, nbs = process_submatrix(submatrix, current_op)
-        logger.info(
-            f"Computing problem applying {current_op} on {nbs} -> adding {inc} to the result"
-        )
-        acc += inc
+        acc = process_and_log(submatrix, current_op, acc)
 
     return acc
 
