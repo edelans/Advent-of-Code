@@ -5,6 +5,8 @@ import logging
 import os
 import sys
 
+import networkx as nx
+
 from aoc_utilities import Input, test_input, timer_func
 
 """
@@ -22,18 +24,6 @@ logger.addHandler(handler)
 
 # 2 digit day fetched from filename
 DAY = os.path.basename(__file__)[3:5]
-
-
-def parser(data: str) -> set[tuple[int, int]]:
-    grid = set()
-    source = None
-    for y, line in enumerate(data.splitlines()):
-        for x, c in enumerate(line.strip()):
-            if c == "^":
-                grid.add((x, y))
-            if c == "S":
-                source = (x, y)
-    return grid, source
 
 
 @timer_func
@@ -59,7 +49,76 @@ def solve1(data):
 @timer_func
 def solve2(data):
     """Solves part2."""
-    pass
+    lines = [list(line.strip()) for line in data.splitlines()]
+
+    # build graph
+    G = nx.DiGraph()
+
+    for y in range(0, len(lines)):
+        for x, c in enumerate(lines[y]):
+            if y == 0:
+                if c == "S":
+                    S = (x, y)
+                    G.add_node((x, y))
+            else:
+                if lines[y - 1][x] == "S" or lines[y - 1][x] == "|":
+                    if c == "^":
+                        G.add_node((x, y))
+
+                        if len(G.nodes) == 2 and x == S[0]:
+                            G.add_edge(S, (x, y))
+                            logger.info(f"added edge from S to {x, y}")
+
+                        # find predecessors
+                        yp = y - 1
+                        while lines[yp][x] == "|":
+                            if (x - 1) >= 0 and lines[yp][x - 1] == "^":
+                                G.add_edge((x - 1, yp), (x, y))
+                                logger.info(
+                                    f"found predecessor on the left at {x - 1, yp} for {x, y}"
+                                )
+                            if (x + 1) < len(lines[yp]) and lines[yp][x + 1] == "^":
+                                G.add_edge((x + 1, yp), (x, y))
+                                logger.info(
+                                    f"found predecessor on the right at {x + 1, yp} for {x, y}"
+                                )
+                            yp -= 1
+
+                        if (x - 1) >= 0:
+                            lines[y][x - 1] = "|"
+                        if (x + 1) < len(lines[y]):
+                            lines[y][x + 1] = "|"
+                    elif c == ".":
+                        lines[y][x] = "|"
+
+    # add end node
+    last_y = len(lines) - 1
+    for x, c in enumerate(lines[last_y]):
+        if c == "|":
+            G.add_node((x, last_y))
+            # find predecessors
+            yp = last_y - 1
+            while lines[yp][x] == "|":
+                if (x - 1) >= 0 and lines[yp][x - 1] == "^":
+                    G.add_edge((x - 1, yp), (x, last_y))
+                    logger.info(
+                        f"found predecessor on the left at {x - 1, yp} for {x, last_y}"
+                    )
+                if (x + 1) < len(lines[yp]) and lines[yp][x + 1] == "^":
+                    G.add_edge((x + 1, yp), (x, last_y))
+                    logger.info(
+                        f"found predecessor on the right at {x + 1, yp} for {x, last_y}"
+                    )
+                yp -= 1
+
+            G.add_edge((x, last_y), "E")
+
+    logger.info(f"There are {len(G.nodes)}, nodes are {G.nodes()}")
+    logger.info(f"edges are {G.edges()}")
+    logger.info("all simple edge paths from S to E are :")
+    for path in nx.all_simple_paths(G, S, "E"):
+        logger.info(f"  - {path}")
+    return len(list(nx.all_simple_paths(G, S, "E")))
 
 
 """
@@ -84,7 +143,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "2t":
         logger.setLevel(logging.INFO)
         res = solve2(test_input(DAY).read())
-        expected = XXX  # TODO: replace with expected value
+        expected = 40  # TODO: replace with expected value
         assert res == expected, f"Expected {expected}, got {res}"
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "2":
