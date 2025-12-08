@@ -4,6 +4,7 @@
 import logging
 import os
 import sys
+from itertools import combinations
 
 from aoc_utilities import Input, test_input, timer_func
 
@@ -24,159 +25,139 @@ logger.addHandler(handler)
 DAY = os.path.basename(__file__)[3:5]
 
 
-def distance(p1, p2):
-    """Return straight line squarred distance between two points in 3D space.
+def distance_squared(p1, p2):
+    """Return squared distance between two points in 3D space.
     Since we are not interested in the actual distance, just in the ordering,
     we calculate the squared distance which saves the math.sqrt() operation.
     """
-    return (p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2 + (p1[2] - p2[2]) ** 2
+    return sum((a - b) ** 2 for a, b in zip(p1, p2, strict=True))
+
+
+def parse_boxes(data):
+    """Parse boxes from input data."""
+    return [tuple(map(int, line.split(","))) for line in data.splitlines()]
+
+
+def merge_circuits(
+    circuits: list[set],
+    box_to_circuit: dict,
+    box1: tuple,
+    box2: tuple,
+    connection_num: int,
+) -> bool:
+    """Merge circuits containing box1 and box2, or create new circuit.
+    Returns True if boxes were merged/added, False if already in same circuit.
+    """
+    circuit1 = box_to_circuit.get(box1)
+    circuit2 = box_to_circuit.get(box2)
+
+    logger.info(f"\n#{connection_num} shortest connection is between {box1} and {box2}")
+
+    def log_circuit_lengths():
+        circuit_lengths = sorted((len(c) for c in circuits), reverse=True)
+        logger.info(f"  - current circuits lengths are: {circuit_lengths}")
+
+    if circuit1 is None and circuit2 is None:
+        # Both boxes are new - create new circuit
+        new_circuit = {box1, box2}
+        circuits.append(new_circuit)
+        box_to_circuit[box1] = new_circuit
+        box_to_circuit[box2] = new_circuit
+        logger.info(
+            f"  - {box1} and {box2} are not part of any circuit, creating a new circuit!"
+        )
+        log_circuit_lengths()
+        return True
+
+    if circuit1 is None:
+        # box1 is new, add it to circuit2
+        circuit2.add(box1)
+        box_to_circuit[box1] = circuit2
+        logger.info(f"  - {box1} is not part of any circuit, adding it to {circuit2}")
+        log_circuit_lengths()
+        return True
+
+    if circuit2 is None:
+        # box2 is new, add it to circuit1
+        circuit1.add(box2)
+        box_to_circuit[box2] = circuit1
+        logger.info(f"  - {box2} is not part of any circuit, adding it to {circuit1}")
+        log_circuit_lengths()
+        return True
+
+    if circuit1 is circuit2:
+        # Both boxes already in same circuit
+        logger.info(
+            f"  - {box1} and {box2} are already part of the same circuit -> no circuit change"
+        )
+        log_circuit_lengths()
+        return False
+
+    # Merge two existing circuits
+    merged = circuit1 | circuit2
+    circuits.remove(circuit1)
+    circuits.remove(circuit2)
+    circuits.append(merged)
+    # Update all boxes in merged circuit to point to new circuit
+    for box in merged:
+        box_to_circuit[box] = merged
+    logger.info(f"  - Merging two existing circuits: {circuit1} and {circuit2}")
+    log_circuit_lengths()
+    return True
 
 
 @timer_func
 def solve1(data, max_connections=1000):
     """Solves part 1."""
-    points = []
-    for line in data.splitlines():
-        points.append(tuple(int(i) for i in line.split(",")))
+    boxes = parse_boxes(data)
 
-    all_distances = []
-    for i in range(len(points)):
-        for j in range(i + 1, len(points)):
-            all_distances.append(
-                tuple((points[i], points[j], distance(points[i], points[j])))
-            )
+    # Generate all pairs with their distances
+    all_distances = [
+        (box1, box2, distance_squared(box1, box2))
+        for box1, box2 in combinations(boxes, 2)
+    ]
     all_distances.sort(key=lambda x: x[2])
 
     circuits = []
+    box_to_circuit = {}  # map each box to its circuit, leverages O(1) dictionary lookups
 
-    for i, d in enumerate(all_distances[0:max_connections]):
-        logger.info(f"\n#{i + 1} shortest connection is between {d[0]} and {d[1]}")
-        c0 = {d[0]}
-        c1 = {d[1]}
-        for c in circuits:
-            if d[0] in c:
-                c0 = c
-                logger.info(f"  - {d[0]} is already in circuit {c}")
-            if d[1] in c:
-                c1 = c
-                logger.info(f"  - {d[1]} is already in circuit {c}")
-        if c0 == c1:
-            logger.info(
-                f"  - {d[0]} and {d[1]} are already part of the same circuit -> no circuit change"
-            )
-        else:
-            if len(c0) == 1 and len(c1) > 1:
-                logger.info(f"  - {d[0]} is not part of any circuit, adding it to {c1}")
-                circuits.remove(c1)
-                c1.add(d[0])
-                circuits.append(c1)
-
-            elif len(c1) == 1 and len(c0) > 1:
-                logger.info(f"  - {d[1]} is not part of any circuit, adding it to {c0}")
-                circuits.remove(c0)
-                c0.add(d[1])
-                circuits.append(c0)
-
-            elif len(c0) == 1 and len(c1) == 1:
-                logger.info(
-                    f"  - {d[0]} and {d[1]} are not part of any circuit, creating a new circuit!"
-                )
-                circuits.append(c0.union(c1))
-            elif len(c0) > 1 and len(c1) > 1:
-                logger.info(
-                    f"  - {d[0]} and {d[1]} are not part of any circuit, creating a new circuit!"
-                )
-                circuits.remove(c0)
-                circuits.remove(c1)
-                circuits.append(c0.union(c1))
-        logger.info(
-            f"  - current circuits lengths are: {sorted([len(c) for c in circuits], reverse=True)}"
-        )
+    for i, (box1, box2, _) in enumerate(all_distances[:max_connections], 1):
+        merge_circuits(circuits, box_to_circuit, box1, box2, i)
 
     logger.info("Final circuits are:")
     for c in circuits:
         logger.info(f"  - {c}")
 
+    circuit_lengths = sorted((len(c) for c in circuits), reverse=True)
     logger.warning(f"Total number of circuits is {len(circuits)}")
-    circuit_lengths = sorted([len(c) for c in circuits], reverse=True)
-    logger.warning(f"3 largest circuit sizes are: {circuit_lengths[0:3]}")
+    logger.warning(f"3 largest circuit sizes are: {circuit_lengths[:3]}")
+
     return circuit_lengths[0] * circuit_lengths[1] * circuit_lengths[2]
 
 
 @timer_func
 def solve2(data):
     """Solves part2."""
-    points = []
-    for line in data.splitlines():
-        points.append(tuple(int(i) for i in line.split(",")))
+    boxes = parse_boxes(data)
+    total_boxes = len(boxes)
 
-    all_distances = []
-    for i in range(len(points)):
-        for j in range(i + 1, len(points)):
-            all_distances.append(
-                tuple((points[i], points[j], distance(points[i], points[j])))
-            )
+    # Generate all pairs with their distances
+    all_distances = [
+        (box1, box2, distance_squared(box1, box2))
+        for box1, box2 in combinations(boxes, 2)
+    ]
     all_distances.sort(key=lambda x: x[2])
 
     circuits = []
+    box_to_circuit = {}
 
-    for i, d in enumerate(all_distances[0:]):
-        logger.info(f"\n#{i + 1} shortest connection is between {d[0]} and {d[1]}")
-        c0 = {d[0]}
-        c1 = {d[1]}
-        for c in circuits:
-            if d[0] in c:
-                c0 = c
-                logger.info(f"  - {d[0]} is already in circuit {c}")
-            if d[1] in c:
-                c1 = c
-                logger.info(f"  - {d[1]} is already in circuit {c}")
-        if c0 == c1:
-            logger.info(
-                f"  - {d[0]} and {d[1]} are already part of the same circuit -> no circuit change"
-            )
-        else:
-            if len(c0) == 1 and len(c1) > 1:
-                logger.info(f"  - {d[0]} is not part of any circuit, adding it to {c1}")
-                circuits.remove(c1)
-                c1.add(d[0])
-                circuits.append(c1)
+    for i, (box1, box2, _) in enumerate(all_distances, 1):
+        merge_circuits(circuits, box_to_circuit, box1, box2, i)
 
-            elif len(c1) == 1 and len(c0) > 1:
-                logger.info(f"  - {d[1]} is not part of any circuit, adding it to {c0}")
-                circuits.remove(c0)
-                c0.add(d[1])
-                circuits.append(c0)
-
-            elif len(c0) == 1 and len(c1) == 1:
-                logger.info(
-                    f"  - {d[0]} and {d[1]} are not part of any circuit, creating a new circuit!"
-                )
-                circuits.append(c0.union(c1))
-            elif len(c0) > 1 and len(c1) > 1:
-                logger.info(
-                    f"  - {d[0]} and {d[1]} are not part of any circuit, creating a new circuit!"
-                )
-                circuits.remove(c0)
-                circuits.remove(c1)
-                circuits.append(c0.union(c1))
-        circuit_lengths = [len(c) for c in circuits]
-        if sum(circuit_lengths) == len(points):
-            logger.info("All points are in circuits!")
-            return d[0][0] * d[1][0]
-
-        logger.info(
-            f"  - current circuits lengths are: {sorted([len(c) for c in circuits], reverse=True)}"
-        )
-
-    logger.info("Final circuits are:")
-    for c in circuits:
-        logger.info(f"  - {c}")
-
-    logger.warning(f"Total number of circuits is {len(circuits)}")
-
-    logger.warning(f"3 largest circuit sizes are: {circuit_lengths[0:3]}")
-    return circuit_lengths[0] * circuit_lengths[1] * circuit_lengths[2]
+        # Check if all boxes are connected (only need to check if we have one circuit)
+        if len(circuits) == 1 and len(circuits[0]) == total_boxes:
+            logger.info("All boxes are in circuits!")
+            return box1[0] * box2[0]
 
 
 """
