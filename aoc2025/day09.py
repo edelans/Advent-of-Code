@@ -75,55 +75,39 @@ def mprint(
 
 
 def edges_intersect(edge1, edge2):
-    """Check if two line segments intersect.
+    """Check if two horizontal or vertical line segments cross.
     Args:
-        edge1: ((x1, y1), (x2, y2)) - first line segment
-        edge2: ((x3, y3), (x4, y4)) - second line segment
+        edge1: ((x1, y1), (x2, y2)) - first line segment (horizontal or vertical)
+        edge2: ((x3, y3), (x4, y4)) - second line segment (horizontal or vertical)
     Returns:
-        True if segments intersect (excluding endpoints), False otherwise
+        True if segments cross (one horizontal, one vertical, and they intersect), False otherwise
     """
     (x1, y1), (x2, y2) = edge1
     (x3, y3), (x4, y4) = edge2
 
-    # Calculate orientation for cross product
-    def orientation(p, q, r):
-        """Returns orientation of triplet (p, q, r).
-        0 = collinear, 1 = clockwise, 2 = counterclockwise
-        """
-        val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
-        if val == 0:
-            return 0
-        return 1 if val > 0 else 2
+    # Determine if edges are horizontal or vertical
+    edge1_horizontal = y1 == y2
+    edge2_horizontal = y3 == y4
 
-    # Check if point lies on segment
-    def on_segment(p, q, r):
-        """Check if point q lies on segment pr"""
-        return (
-            q[0] <= max(p[0], r[0])
-            and q[0] >= min(p[0], r[0])
-            and q[1] <= max(p[1], r[1])
-            and q[1] >= min(p[1], r[1])
-        )
+    # Both horizontal or both vertical: they don't cross, they overlap (return False)
+    if edge1_horizontal == edge2_horizontal:
+        return False
 
-    # Find orientations
-    o1 = orientation((x1, y1), (x2, y2), (x3, y3))
-    o2 = orientation((x1, y1), (x2, y2), (x4, y4))
-    o3 = orientation((x3, y3), (x4, y4), (x1, y1))
-    o4 = orientation((x3, y3), (x4, y4), (x2, y2))
-
-    # General case: segments intersect if orientations are different
-    # General case: segments intersect if orientations are different
-    if o1 != o2 and o3 != o4:
-        return True
-
-    # Special cases: collinear points
-    # Check if endpoints of one segment lie on the other segment
-    return (
-        (o1 == 0 and on_segment((x1, y1), (x3, y3), (x2, y2)))
-        or (o2 == 0 and on_segment((x1, y1), (x4, y4), (x2, y2)))
-        or (o3 == 0 and on_segment((x3, y3), (x1, y1), (x4, y4)))
-        or (o4 == 0 and on_segment((x3, y3), (x2, y2), (x4, y4)))
-    )
+    # One horizontal, one vertical: check if they cross (not just touch at endpoints)
+    if edge1_horizontal:
+        # edge1 is horizontal, edge2 is vertical
+        x_min, x_max = min(x1, x2), max(x1, x2)
+        y_min, y_max = min(y3, y4), max(y3, y4)
+        # Cross only if vertical x is strictly inside horizontal range
+        # and horizontal y is strictly inside vertical range
+        return x_min < x3 < x_max and y_min < y1 < y_max
+    else:
+        # edge1 is vertical, edge2 is horizontal
+        y_min, y_max = min(y1, y2), max(y1, y2)
+        x_min, x_max = min(x3, x4), max(x3, x4)
+        # Cross only if horizontal y is strictly inside vertical range
+        # and vertical x is strictly inside horizontal range
+        return y_min < y3 < y_max and x_min < x1 < x_max
 
 
 def is_rect_inside_path(tile1, tile2, path_tiles):
@@ -155,6 +139,9 @@ def is_rect_inside_path(tile1, tile2, path_tiles):
         ((x_max, y_min), (x_max, y_max)),  # right edge
     ]
 
+    logger.info(
+        f"Rectangle formed by {tile1} and {tile2} has all corners inside the polygon, checking its edges now..."
+    )
     # Check against all polygon edges
     n = len(path_tiles)
     for rect_edge in rect_edges:
@@ -162,18 +149,10 @@ def is_rect_inside_path(tile1, tile2, path_tiles):
         for i in range(n):
             poly_edge = (path_tiles[i], path_tiles[(i + 1) % n])
             if edges_intersect(rect_edge, poly_edge):
-                # Edges intersect - check if rectangle edge goes outside
-                # Sample points along the rectangle edge to see if any are outside
-                if rx1 == rx2:  # Vertical edge
-                    # Sample points along vertical edge
-                    for y in range(min(ry1, ry2), max(ry1, ry2) + 1):
-                        if not point_in_polygon((rx1, y), path_tiles):
-                            return False  # Rectangle edge crosses outside
-                else:  # Horizontal edge
-                    # Sample points along horizontal edge
-                    for x in range(min(rx1, rx2), max(rx1, rx2) + 1):
-                        if not point_in_polygon((x, ry1), path_tiles):
-                            return False  # Rectangle edge crosses outside
+                logger.info(
+                    f"  - Rectangle edge {rect_edge} intersects polygon edge {poly_edge}"
+                )
+                return False  # Rectangle crosses polygon boundary
 
     return True
 
@@ -258,5 +237,5 @@ if __name__ == "__main__":
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "2":
         logger.setLevel(logging.WARNING)
-        res = solve2(Input(DAY).read())  # 4599890450 -> too high
+        res = solve2(Input(DAY).read())  # 4599890450 -> too high, 114727710 -> too low
         print(res)
