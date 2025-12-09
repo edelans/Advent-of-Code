@@ -149,6 +149,8 @@ def is_rect_inside_path(
         f"Rectangle formed by {tile1} and {tile2} has all corners inside the polygon, checking its edges now..."
     )
 
+    # now we know all the corners are inside the polygon,
+    # but the rectangle wouldn't be entirely inside the polygon if any of its edges intersect with the polygon edges
     n = len(path_tiles)
     for rect_edge in rect_edges:
         for i in range(n):

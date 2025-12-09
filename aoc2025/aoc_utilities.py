@@ -103,7 +103,7 @@ def timer_func(func):
     return wrap_func
 
 
-def point_in_polygon(point, polygon):
+def point_in_polygon(point: tuple[int, int], polygon: list[tuple[int, int]]) -> bool:
     """Ray casting algorithm to check if point is inside polygon.
     Concept:
       - Cast a horizontal ray from the point to the right (positive x). Yes, only 1 direction is needed.
@@ -123,12 +123,10 @@ def point_in_polygon(point, polygon):
         ]  # get next vertex, i % n will wrap around to the first vertex
 
         # First check if point is exactly on this edge (including horizontal edges)
-        if p1y == p2y == y:  # horizontal edge at same y as point
-            if min(p1x, p2x) <= x <= max(p1x, p2x):
-                return True  # point is on horizontal edge, consider it inside
-        elif p1x == p2x == x:  # vertical edge at same x as point
-            if min(p1y, p2y) <= y <= max(p1y, p2y):
-                return True  # point is on vertical edge, consider it inside
+        if p1y == p2y == y and min(p1x, p2x) <= x <= max(p1x, p2x):
+            return True  # point is on horizontal edge, consider it inside
+        elif p1x == p2x == x and min(p1y, p2y) <= y <= max(p1y, p2y):
+            return True  # point is on vertical edge, consider it inside
 
         # Check if ray crosses this edge
         if (
@@ -162,7 +160,7 @@ def test_point_in_polygon():
     polygon = [(2, 1), (7, 1), (7, 4), (12, 4), (12, 2), (14, 2), (14, 6), (2, 6)]
 
     """
-    X = (0,0) -> outside 
+    X = (0,0) -> outside
 
         |0   |5   |10  |15
     0  X------------------>
@@ -174,10 +172,10 @@ def test_point_in_polygon():
         ..#############.....
         ....................
     """
-    assert point_in_polygon((0, 0), polygon) == False
+    assert not point_in_polygon((0, 0), polygon)
 
     """
-    X = (0,3) -> outside 
+    X = (0,3) -> outside
 
         |0   |5   |10  |15
     0  ....................
@@ -189,10 +187,10 @@ def test_point_in_polygon():
         ..#############.....
         ....................
     """
-    assert point_in_polygon((0, 3), polygon) == False
+    assert not point_in_polygon((0, 3), polygon)
 
     """
-    X = (5,3) -> inside 
+    X = (5,3) -> inside
 
         |0   |5   |10  |15
     0  ....................
@@ -204,10 +202,10 @@ def test_point_in_polygon():
         ..#############.....
         ....................
     """
-    assert point_in_polygon((5, 3), polygon) == True
+    assert point_in_polygon((5, 3), polygon)
 
     """
-    X = (10,3) -> outside 
+    X = (10,3) -> outside
 
         |0   |5   |10  |15
     0  ....................
@@ -219,10 +217,10 @@ def test_point_in_polygon():
         ..#############.....
         ....................
     """
-    assert point_in_polygon((10, 3), polygon) == False
+    assert not point_in_polygon((10, 3), polygon)
 
     """
-    X = (13,3) -> inside 
+    X = (13,3) -> inside
 
         |0   |5   |10  |15
     0  ....................
@@ -234,10 +232,10 @@ def test_point_in_polygon():
         ..#############.....
         ....................
     """
-    assert point_in_polygon((13, 3), polygon) == True
+    assert point_in_polygon((13, 3), polygon)
 
     """
-    X = (17,3) -> outside 
+    X = (17,3) -> outside
 
         |0   |5   |10  |15
     0  ....................
@@ -249,10 +247,10 @@ def test_point_in_polygon():
         ..#############.....
         ....................
     """
-    assert point_in_polygon((17, 3), polygon) == False
+    assert not point_in_polygon((17, 3), polygon)
 
     """
-    X = (5,1) -> inside 
+    X = (5,1) -> inside
 
         |0   |5   |10  |15
     0  ....................
@@ -264,6 +262,6 @@ def test_point_in_polygon():
         ..#############.....
         ....................
     """
-    assert point_in_polygon((5, 1), polygon) == True
+    assert point_in_polygon((5, 1), polygon)
 
     print("All point_in_polygon tests passed!")
