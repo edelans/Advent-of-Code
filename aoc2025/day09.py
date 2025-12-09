@@ -69,89 +69,6 @@ def mprint(
     return
 
 
-def edges_intersect(edge1, edge2):
-    """Check if two horizontal or vertical line segments cross.
-    Args:
-        edge1: ((x1, y1), (x2, y2)) - first line segment (horizontal or vertical)
-        edge2: ((x3, y3), (x4, y4)) - second line segment (horizontal or vertical)
-    Returns:
-        True if segments cross (one horizontal, one vertical, and they intersect), False otherwise
-    """
-    (x1, y1), (x2, y2) = edge1
-    (x3, y3), (x4, y4) = edge2
-
-    # Determine if edges are horizontal or vertical
-    edge1_horizontal = y1 == y2
-    edge2_horizontal = y3 == y4
-
-    # Both horizontal or both vertical: they don't cross, they overlap (return False)
-    if edge1_horizontal == edge2_horizontal:
-        return False
-
-    # One horizontal, one vertical: check if they cross (not just touch at endpoints)
-    if edge1_horizontal:
-        # edge1 is horizontal, edge2 is vertical
-        x_min, x_max = min(x1, x2), max(x1, x2)
-        y_min, y_max = min(y3, y4), max(y3, y4)
-        # Cross only if vertical x is strictly inside horizontal range
-        # and horizontal y is strictly inside vertical range
-        return x_min < x3 < x_max and y_min < y1 < y_max
-    else:
-        # edge1 is vertical, edge2 is horizontal
-        y_min, y_max = min(y1, y2), max(y1, y2)
-        x_min, x_max = min(x3, x4), max(x3, x4)
-        # Cross only if horizontal y is strictly inside vertical range
-        # and vertical x is strictly inside horizontal range
-        return y_min < y3 < y_max and x_min < x1 < x_max
-
-
-def is_rect_inside_path(tile1, tile2, path_tiles):
-    """Check if rectangle defined by tile1 and tile2 is completely inside the path."""
-    x_min = min(tile1[0], tile2[0])
-    x_max = max(tile1[0], tile2[0])
-    y_min = min(tile1[1], tile2[1])
-    y_max = max(tile1[1], tile2[1])
-
-    # Check all four corners first (fast early exit)
-    corners = [
-        (x_min, y_min),
-        (x_max, y_min),
-        (x_min, y_max),
-        (x_max, y_max),
-    ]
-
-    # If any corner is outside, rectangle can't be completely inside
-    if not all(point_in_polygon(corner, path_tiles) for corner in corners):
-        return False
-
-    # All corners are inside, now check if any rectangle edge crosses outside
-    # (needed for concave polygons where edges might cross outside)
-    # If an edge intersects a polygon edge, check if any point on the rectangle edge is outside
-    rect_edges = [
-        ((x_min, y_min), (x_max, y_min)),  # bottom edge
-        ((x_min, y_max), (x_max, y_max)),  # top edge
-        ((x_min, y_min), (x_min, y_max)),  # left edge
-        ((x_max, y_min), (x_max, y_max)),  # right edge
-    ]
-
-    logger.info(
-        f"Rectangle formed by {tile1} and {tile2} has all corners inside the polygon, checking its edges now..."
-    )
-    # Check against all polygon edges
-    n = len(path_tiles)
-    for rect_edge in rect_edges:
-        (rx1, ry1), (rx2, ry2) = rect_edge
-        for i in range(n):
-            poly_edge = (path_tiles[i], path_tiles[(i + 1) % n])
-            if edges_intersect(rect_edge, poly_edge):
-                logger.info(
-                    f"  - Rectangle edge {rect_edge} intersects polygon edge {poly_edge}"
-                )
-                return False  # Rectangle crosses polygon boundary
-
-    return True
-
-
 def add_green_tiles(red_tiles, tiles_dict):
     """Add green tiles connecting consecutive red tiles."""
     for i in range(len(red_tiles)):
@@ -170,27 +87,91 @@ def add_green_tiles(red_tiles, tiles_dict):
     mprint(tiles_dict)
 
 
+def edges_intersect(edge1, edge2):
+    """Check if two horizontal or vertical line segments cross.
+    Args:
+        edge1: ((x1, y1), (x2, y2)) - first line segment (horizontal or vertical)
+        edge2: ((x3, y3), (x4, y4)) - second line segment (horizontal or vertical)
+    Returns:
+        True if segments cross (one horizontal, one vertical, and they intersect), False otherwise
+    """
+    (x1, y1), (x2, y2) = edge1
+    (x3, y3), (x4, y4) = edge2
+
+    edge1_horizontal = y1 == y2
+    edge2_horizontal = y3 == y4
+
+    # Both same orientation: they don't cross
+    if edge1_horizontal == edge2_horizontal:
+        return False
+
+    # Make edge1 horizontal, edge2 vertical (swap if needed)
+    if not edge1_horizontal:
+        (x1, y1), (x2, y2), (x3, y3), (x4, y4) = (x3, y3), (x4, y4), (x1, y1), (x2, y2)
+
+    # Now edge1 is horizontal, edge2 is vertical
+    x_min, x_max = min(x1, x2), max(x1, x2)
+    y_min, y_max = min(y3, y4), max(y3, y4)
+    return x_min < x3 < x_max and y_min < y1 < y_max
+
+
+def is_rect_inside_path(tile1, tile2, path_tiles):
+    """Check if rectangle defined by tile1 and tile2 is completely inside the path."""
+    x_min, x_max = min(tile1[0], tile2[0]), max(tile1[0], tile2[0])
+    y_min, y_max = min(tile1[1], tile2[1]), max(tile1[1], tile2[1])
+
+    corners = [
+        (x_min, y_min),
+        (x_max, y_min),
+        (x_min, y_max),
+        (x_max, y_max),
+    ]
+
+    # Early exit if any corner is outside
+    if any(not point_in_polygon(corner, path_tiles) for corner in corners):
+        return False
+
+    rect_edges = [
+        ((x_min, y_min), (x_max, y_min)),  # bottom edge
+        ((x_min, y_max), (x_max, y_max)),  # top edge
+        ((x_min, y_min), (x_min, y_max)),  # left edge
+        ((x_max, y_min), (x_max, y_max)),  # right edge
+    ]
+
+    logger.info(
+        f"Rectangle formed by {tile1} and {tile2} has all corners inside the polygon, checking its edges now..."
+    )
+
+    n = len(path_tiles)
+    for rect_edge in rect_edges:
+        for i in range(n):
+            poly_edge = (path_tiles[i], path_tiles[(i + 1) % n])
+            if edges_intersect(rect_edge, poly_edge):
+                logger.info(
+                    f"  - Rectangle edge {rect_edge} intersects polygon edge {poly_edge}"
+                )
+                return False
+
+    return True
+
+
 @timer_func
 def solve2(data):
     """Solves part2."""
-
-    # add red tiles
     lines = [line.strip() for line in data.splitlines()]
-    red_tiles = [tuple(map(int, line.split(","))) for line in lines]
-    logger.debug(f"Red tiles: {red_tiles}")
+    red_tiles = [tuple[int, ...](map(int, line.split(","))) for line in lines]
 
-    max_area_inside = 0
-    for tile1, tile2 in combinations(red_tiles, 2):
-        rect_area = area(tile1, tile2)
+    # Generate combinations sorted by area descending, allows early exit in iteration below
+    all_combinations = sorted(
+        combinations(red_tiles, 2),
+        key=lambda pair: area(pair[0], pair[1]),
+        reverse=True,
+    )
+    logger.info("All combinations generated and sorted.")
 
-        # Early exit: skip if area is not larger than current max
-        if rect_area <= max_area_inside:
-            continue
-
+    for tile1, tile2 in all_combinations:
         if is_rect_inside_path(tile1, tile2, red_tiles):
-            max_area_inside = rect_area
-            logger.warning(f"New max_area_inside ({max_area_inside}) found.")
-    return max_area_inside
+            return area(tile1, tile2)
 
 
 """
