@@ -25,7 +25,7 @@ logger.addHandler(handler)
 DAY = os.path.basename(__file__)[3:5]
 
 
-def area(tile1, tile2):
+def area(tile1: tuple[int, int], tile2: tuple[int, int]) -> int:
     return (abs(tile2[0] - tile1[0]) + 1) * (abs(tile2[1] - tile1[1]) + 1)
 
 
@@ -69,7 +69,9 @@ def mprint(
     return
 
 
-def add_green_tiles(red_tiles, tiles_dict):
+def add_green_tiles(
+    red_tiles: list[tuple[int, int]], tiles_dict: dict[tuple[int, int], str | int]
+) -> None:
     """Add green tiles connecting consecutive red tiles."""
     for i in range(len(red_tiles)):
         tile1 = red_tiles[i]
@@ -87,7 +89,10 @@ def add_green_tiles(red_tiles, tiles_dict):
     mprint(tiles_dict)
 
 
-def edges_intersect(edge1, edge2):
+def edges_intersect(
+    edge1: tuple[tuple[int, int], tuple[int, int]],
+    edge2: tuple[tuple[int, int], tuple[int, int]],
+) -> bool:
     """Check if two horizontal or vertical line segments cross.
     Args:
         edge1: ((x1, y1), (x2, y2)) - first line segment (horizontal or vertical)
@@ -115,7 +120,9 @@ def edges_intersect(edge1, edge2):
     return x_min < x3 < x_max and y_min < y1 < y_max
 
 
-def is_rect_inside_path(tile1, tile2, path_tiles):
+def is_rect_inside_path(
+    tile1: tuple[int, int], tile2: tuple[int, int], path_tiles: list[tuple[int, int]]
+) -> bool:
     """Check if rectangle defined by tile1 and tile2 is completely inside the path."""
     x_min, x_max = min(tile1[0], tile2[0]), max(tile1[0], tile2[0])
     y_min, y_max = min(tile1[1], tile2[1]), max(tile1[1], tile2[1])
