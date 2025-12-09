@@ -32,17 +32,12 @@ def area(tile1, tile2):
 @timer_func
 def solve1(data):
     """Solves part 1."""
-    tiles = []
     lines = [line.strip() for line in data.splitlines()]
-    for line in lines:
-        x, y = line.split(",")
-        x = int(x)
-        y = int(y)
-        tiles.append((x, y))
+    red_tiles = [tuple(map(int, line.split(","))) for line in lines]
 
     max_area = 0
-    logger.info(f"tiles are {tiles}")
-    for tile1, tile2 in combinations(tiles, 2):
+    logger.info(f"red_tiles are {red_tiles}")
+    for tile1, tile2 in combinations(red_tiles, 2):
         logger.info(f"Area between tiles {tile1} and {tile2} is {area(tile1, tile2)}")
         if area(tile1, tile2) > max_area:
             max_area = area(tile1, tile2)
@@ -181,32 +176,20 @@ def solve2(data):
 
     # add red tiles
     lines = [line.strip() for line in data.splitlines()]
-    red_tiles = []
-    for line in lines:
-        x, y = line.split(",")
-        x = int(x)
-        y = int(y)
-        red_tiles.append((x, y))
-
-    logger.info(f"Red tiles: {red_tiles}")
+    red_tiles = [tuple(map(int, line.split(","))) for line in lines]
+    logger.debug(f"Red tiles: {red_tiles}")
 
     max_area_inside = 0
     for tile1, tile2 in combinations(red_tiles, 2):
         rect_area = area(tile1, tile2)
+
         # Early exit: skip if area is not larger than current max
         if rect_area <= max_area_inside:
             continue
 
-        logger.info(f"Area between tiles {tile1} and {tile2} is {rect_area}")
-
         if is_rect_inside_path(tile1, tile2, red_tiles):
-            logger.info(
-                f"Area between tiles {tile1} and {tile2} is inside allowed tiles"
-            )
             max_area_inside = rect_area
-            logger.warning(
-                f"Found new max_area_inside is {max_area_inside} for tiles {tile1} and {tile2}"
-            )
+            logger.warning(f"New max_area_inside ({max_area_inside}) found.")
     return max_area_inside
 
 
