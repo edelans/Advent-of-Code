@@ -6,7 +6,7 @@ import os
 import sys
 from itertools import combinations
 
-from aoc_utilities import Input, test_input, timer_func
+from aoc_utilities import Input, point_in_polygon, test_input, timer_func
 
 """
 Logger config
@@ -52,7 +52,11 @@ def solve1(data):
     return max_area
 
 
-def mprint(maping: dict[tuple[int, int], str | int], padding: int = 2) -> None:
+def mprint(
+    maping: dict[tuple[int, int], str | int],
+    padding: int = 2,
+    log_level: int = logging.DEBUG,
+) -> None:
     """
     Helper function to print a map
     when the map is a dictionary, with keys as tuples of coordinates (1,2)
@@ -63,24 +67,63 @@ def mprint(maping: dict[tuple[int, int], str | int], padding: int = 2) -> None:
     ymax = max([int(j) for (i, j) in maping]) + padding
     ymin = min([int(j) for (i, j) in maping]) - padding
     for y in range(ymin, ymax, 1):
-        logger.info(
-            "".join([str(maping.get((x, y), ".")) for x in range(xmin, xmax + 1)])
+        logger.log(
+            log_level,
+            "".join([str(maping.get((x, y), ".")) for x in range(xmin, xmax + 1)]),
         )
     return
 
 
-def is_area_inside(tile1, tile2, tiles_dict):
-    for x in range(min(tile1[0], tile2[0]), max(tile1[0], tile2[0]) + 1):
-        for y in range(min(tile1[1], tile2[1]), max(tile1[1], tile2[1]) + 1):
-            if (x, y) not in tiles_dict:
+def is_rect_inside_path(tile1, tile2, path_tiles):
+    """Check if rectangle defined by tile1 and tile2 is completely inside the path."""
+    x_min = min(tile1[0], tile2[0])
+    x_max = max(tile1[0], tile2[0])
+    y_min = min(tile1[1], tile2[1])
+    y_max = max(tile1[1], tile2[1])
+
+    # Check all four corners first (fast early exit)
+    corners = [
+        (x_min, y_min),
+        (x_max, y_min),
+        (x_min, y_max),
+        (x_max, y_max),
+    ]
+
+    # If any corner is outside, rectangle can't be completely inside
+    if not all(point_in_polygon(corner, path_tiles) for corner in corners):
+        return False
+
+    # All corners are inside, now check all points in the rectangle
+    # (needed for concave polygons where edges might cross outside)
+    for x in range(x_min, x_max + 1):
+        for y in range(y_min, y_max + 1):
+            if not point_in_polygon((x, y), path_tiles):
                 return False
+
     return True
+
+
+def add_green_tiles(red_tiles, tiles_dict):
+    """Add green tiles connecting consecutive red tiles."""
+    for i in range(len(red_tiles)):
+        tile1 = red_tiles[i]
+        tile2 = red_tiles[i + 1] if i + 1 < len(red_tiles) else red_tiles[0]
+        # add all tiles between tile1 and tile2
+        x_min, x_max = min(tile1[0], tile2[0]), max(tile1[0], tile2[0])
+        y_min, y_max = min(tile1[1], tile2[1]), max(tile1[1], tile2[1])
+        for x in range(x_min, x_max + 1):
+            for y in range(y_min, y_max + 1):
+                tiles_dict.setdefault((x, y), "X")
+        logger.debug(f"Added green tiles between {tile1} and {tile2}")
+        mprint(tiles_dict, log_level=logging.DEBUG)
+
+    logger.info("\nWith green tiles: ")
+    mprint(tiles_dict)
 
 
 @timer_func
 def solve2(data):
     """Solves part2."""
-    tiles_dict = {}
 
     # add red tiles
     lines = [line.strip() for line in data.splitlines()]
@@ -90,56 +133,24 @@ def solve2(data):
         x = int(x)
         y = int(y)
         red_tiles.append((x, y))
-        tiles_dict[(x, y)] = "#"
 
-    logger.info("\nWith red tiles: ")
-    mprint(tiles_dict)
-
-    logger.info(f"red tiles are {red_tiles}")
-
-    # add green tiles (connect consecutive red tiles)
-    for i in range(len(red_tiles)):
-        tile1 = red_tiles[i]
-        tile2 = red_tiles[i + 1] if i + 1 < len(red_tiles) else red_tiles[-1]
-        # add all tiles between tile1 and tile2
-        x_min, x_max = min(tile1[0], tile2[0]), max(tile1[0], tile2[0])
-        y_min, y_max = min(tile1[1], tile2[1]), max(tile1[1], tile2[1])
-        for x in range(x_min, x_max + 1):
-            for y in range(y_min, y_max + 1):
-                tiles_dict.setdefault((x, y), "X")
-
-    logger.info("\nWith green tiles: ")
-    mprint(tiles_dict)
-
-    # fill allowed tiles with green tiles in the middle
-    ymax = max(tiles_dict.keys(), key=lambda x: x[1])[1]
-    ymin = min(tiles_dict.keys(), key=lambda x: x[1])[1]
-    for y in range(ymin, ymax + 1):
-        xtmin = min([tile[0] for tile in tiles_dict if tile[1] == y])
-        xtmax = max([tile[0] for tile in tiles_dict if tile[1] == y])
-        for x in range(xtmin, xtmax + 1):
-            if (x, y) not in tiles_dict:
-                tiles_dict[(x, y)] = "X"
-
-    logger.info("\nWith filler tiles: ")
-    mprint(tiles_dict)
+    logger.info(f"Red tiles: {red_tiles}")
 
     max_area_inside = 0
-    # Use red_tiles directly instead of filtering from tiles_dict
     for tile1, tile2 in combinations(red_tiles, 2):
         rect_area = area(tile1, tile2)
         # Early exit: skip if area is not larger than current max
         if rect_area <= max_area_inside:
             continue
 
-        logger.debug(f"Area between tiles {tile1} and {tile2} is {rect_area}")
+        logger.info(f"Area between tiles {tile1} and {tile2} is {rect_area}")
 
-        if is_area_inside(tile1, tile2, tiles_dict):
-            logger.debug(
+        if is_rect_inside_path(tile1, tile2, red_tiles):
+            logger.info(
                 f"Area between tiles {tile1} and {tile2} is inside allowed tiles"
             )
             max_area_inside = rect_area
-            logger.debug(
+            logger.warning(
                 f"Found new max_area_inside is {max_area_inside} for tiles {tile1} and {tile2}"
             )
     return max_area_inside
