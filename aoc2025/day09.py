@@ -74,6 +74,58 @@ def mprint(
     return
 
 
+def edges_intersect(edge1, edge2):
+    """Check if two line segments intersect.
+    Args:
+        edge1: ((x1, y1), (x2, y2)) - first line segment
+        edge2: ((x3, y3), (x4, y4)) - second line segment
+    Returns:
+        True if segments intersect (excluding endpoints), False otherwise
+    """
+    (x1, y1), (x2, y2) = edge1
+    (x3, y3), (x4, y4) = edge2
+
+    # Calculate orientation for cross product
+    def orientation(p, q, r):
+        """Returns orientation of triplet (p, q, r).
+        0 = collinear, 1 = clockwise, 2 = counterclockwise
+        """
+        val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
+        if val == 0:
+            return 0
+        return 1 if val > 0 else 2
+
+    # Check if point lies on segment
+    def on_segment(p, q, r):
+        """Check if point q lies on segment pr"""
+        return (
+            q[0] <= max(p[0], r[0])
+            and q[0] >= min(p[0], r[0])
+            and q[1] <= max(p[1], r[1])
+            and q[1] >= min(p[1], r[1])
+        )
+
+    # Find orientations
+    o1 = orientation((x1, y1), (x2, y2), (x3, y3))
+    o2 = orientation((x1, y1), (x2, y2), (x4, y4))
+    o3 = orientation((x3, y3), (x4, y4), (x1, y1))
+    o4 = orientation((x3, y3), (x4, y4), (x2, y2))
+
+    # General case: segments intersect if orientations are different
+    # General case: segments intersect if orientations are different
+    if o1 != o2 and o3 != o4:
+        return True
+
+    # Special cases: collinear points
+    # Check if endpoints of one segment lie on the other segment
+    return (
+        (o1 == 0 and on_segment((x1, y1), (x3, y3), (x2, y2)))
+        or (o2 == 0 and on_segment((x1, y1), (x4, y4), (x2, y2)))
+        or (o3 == 0 and on_segment((x3, y3), (x1, y1), (x4, y4)))
+        or (o4 == 0 and on_segment((x3, y3), (x2, y2), (x4, y4)))
+    )
+
+
 def is_rect_inside_path(tile1, tile2, path_tiles):
     """Check if rectangle defined by tile1 and tile2 is completely inside the path."""
     x_min = min(tile1[0], tile2[0])
@@ -93,12 +145,35 @@ def is_rect_inside_path(tile1, tile2, path_tiles):
     if not all(point_in_polygon(corner, path_tiles) for corner in corners):
         return False
 
-    # All corners are inside, now check all points in the rectangle
+    # All corners are inside, now check if any rectangle edge crosses outside
     # (needed for concave polygons where edges might cross outside)
-    for x in range(x_min, x_max + 1):
-        for y in range(y_min, y_max + 1):
-            if not point_in_polygon((x, y), path_tiles):
-                return False
+    # If an edge intersects a polygon edge, check if any point on the rectangle edge is outside
+    rect_edges = [
+        ((x_min, y_min), (x_max, y_min)),  # bottom edge
+        ((x_min, y_max), (x_max, y_max)),  # top edge
+        ((x_min, y_min), (x_min, y_max)),  # left edge
+        ((x_max, y_min), (x_max, y_max)),  # right edge
+    ]
+
+    # Check against all polygon edges
+    n = len(path_tiles)
+    for rect_edge in rect_edges:
+        (rx1, ry1), (rx2, ry2) = rect_edge
+        for i in range(n):
+            poly_edge = (path_tiles[i], path_tiles[(i + 1) % n])
+            if edges_intersect(rect_edge, poly_edge):
+                # Edges intersect - check if rectangle edge goes outside
+                # Sample points along the rectangle edge to see if any are outside
+                if rx1 == rx2:  # Vertical edge
+                    # Sample points along vertical edge
+                    for y in range(min(ry1, ry2), max(ry1, ry2) + 1):
+                        if not point_in_polygon((rx1, y), path_tiles):
+                            return False  # Rectangle edge crosses outside
+                else:  # Horizontal edge
+                    # Sample points along horizontal edge
+                    for x in range(min(rx1, rx2), max(rx1, rx2) + 1):
+                        if not point_in_polygon((x, ry1), path_tiles):
+                            return False  # Rectangle edge crosses outside
 
     return True
 
@@ -183,5 +258,5 @@ if __name__ == "__main__":
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "2":
         logger.setLevel(logging.WARNING)
-        res = solve2(Input(DAY).read())
+        res = solve2(Input(DAY).read())  # 4599890450 -> too high
         print(res)
