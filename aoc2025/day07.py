@@ -47,7 +47,7 @@ def solve1(data):
 
 
 @timer_func
-def solve2(data):
+def solve2_old(data):
     """Solves part2."""
     lines = [list(line.strip()) for line in data.splitlines()]
 
@@ -119,6 +119,36 @@ def solve2(data):
     for path in nx.all_simple_paths(G, S, "E"):
         logger.info(f"  - {path}")
     return len(list(nx.all_simple_paths(G, S, "E")))
+
+
+@timer_func
+def solve2(data):
+    """Solves part 2."""
+    lines = [list(line.strip()) for line in data.splitlines()]
+    timelines = [0 for _ in range(len(lines[0]))]
+    for x, c in enumerate(lines[0]):
+        if c == "S":
+            timelines[x] = 1
+
+    for y in range(1, len(lines)):
+        new_timelines = timelines.copy()
+        for x, c in enumerate(lines[y]):
+            if lines[y - 1][x] == "S" or lines[y - 1][x] == "|":
+                if c == "^":
+                    if (x - 1) >= 0:
+                        lines[y][x - 1] = "|"
+                        new_timelines[x - 1] += timelines[x]
+                        new_timelines[x] = 0
+                    if (x + 1) < len(lines[y]):
+                        lines[y][x + 1] = "|"
+                        new_timelines[x + 1] += timelines[x]
+                        new_timelines[x] = 0
+                elif c == ".":
+                    lines[y][x] = "|"
+        logger.info(f"timelines are {timelines}")
+        timelines = new_timelines
+
+    return sum(timelines)
 
 
 """
