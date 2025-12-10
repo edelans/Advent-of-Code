@@ -3,6 +3,7 @@
 
 import logging
 import os
+import random
 import sys
 
 from aoc_utilities import Input, test_input, timer_func
@@ -53,7 +54,18 @@ def push_button(light_diagram: list[bool], button_wiring: tuple[int, ...]):
 def min_button_presses(
     target_light_diagram: list[bool], buttons: tuple[tuple[int, ...], ...]
 ):
-    pass
+    for _ in range(2 * len(buttons) + 2 * len(target_light_diagram)):
+        light_diagram = target_light_diagram
+        min_presses = 0
+        for presses, _ in enumerate(range(len(buttons)), 1):
+            button = buttons[
+                random.randint(0, len(buttons) - 1)
+            ]  # pick a random button
+            light_diagram = push_button(light_diagram, button)
+            if light_diagram == target_light_diagram:
+                min_presses = presses
+                break
+    return min_presses
 
 
 @timer_func
