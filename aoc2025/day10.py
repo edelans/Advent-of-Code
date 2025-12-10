@@ -51,21 +51,57 @@ def push_button(light_diagram: list[bool], button_wiring: tuple[int, ...]):
     return light_diagram
 
 
+def stringify(light_diagram: list[bool]):
+    return "".join(["#" if light else "." for light in light_diagram])
+
+
 def min_button_presses(
     target_light_diagram: list[bool], buttons: tuple[tuple[int, ...], ...]
 ):
-    for _ in range(2 * len(buttons) + 2 * len(target_light_diagram)):
-        light_diagram = target_light_diagram
-        min_presses = 0
-        for presses, _ in enumerate(range(len(buttons)), 1):
-            button = buttons[
-                random.randint(0, len(buttons) - 1)
-            ]  # pick a random button
+    min_presses = float("inf")
+    # Try random combinations of button presses to reach target
+    # Repeat max_iterations times
+    # keep track of the minimum
+    # max_iterations: scales with buttons since more buttons = larger search space
+    # yes, this is a bit lame, totally unreliable, and super lazy
+    # ... but was fun to try and tune to see it work :)
+    max_iterations = 1000 * len(buttons)
+    for _ in range(max_iterations):
+        light_diagram = [False] * len(target_light_diagram)
+        logger.info("Starting a new random search!")
+        max_presses = (
+            min(2 * len(buttons), min_presses - 1)
+            if min_presses != float("inf")
+            else 2 * len(buttons)
+        )
+        last_button = None
+        for presses in range(1, max_presses + 1):
+            if last_button is not None and len(buttons) > 1:
+                # Pick a button different from the last one
+                # because pushing the same button twice returns to the same light diagram
+                available_buttons = [b for b in buttons if b != last_button]
+                button = available_buttons[
+                    random.randint(0, len(available_buttons) - 1)
+                ]
+            else:
+                button = buttons[random.randint(0, len(buttons) - 1)]
+            last_button = button
+            logger.info(
+                f"  - Light diagram is: {stringify(light_diagram)}, pushing button: {button}"
+            )
             light_diagram = push_button(light_diagram, button)
+            # logger.info(f" -> Light diagram is now: {stringify(light_diagram)}")
             if light_diagram == target_light_diagram:
-                min_presses = presses
+                logger.info(
+                    f"  - Light diagram is: {stringify(light_diagram)} and matches target!"
+                )
+                logger.info(f"  -> Found a combination with min presses: {presses}!")
+                if presses < min_presses:
+                    logger.info("This is a new minimum!")
+                    min_presses = presses
                 break
-    return min_presses
+        logger.info(f"Couldn't find a new better combination in {max_presses} presses!")
+    return min_presses if min_presses != float("inf") else -1
 
 
 @timer_func
@@ -165,7 +201,7 @@ if __name__ == "__main__":
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "1":
         logger.setLevel(logging.WARNING)
-        res = solve1(Input(DAY).read())
+        res = solve1(Input(DAY).read())  # 489 too high
         print(res)
     if len(sys.argv) > 1 and sys.argv[1] == "2t":
         logger.setLevel(logging.INFO)
