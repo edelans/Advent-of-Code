@@ -104,6 +104,40 @@ def min_button_presses(
     return min_presses if min_presses != float("inf") else -1
 
 
+def min_button_presses_bfs(
+    target_light_diagram: list[bool], buttons: tuple[tuple[int, ...], ...]
+):
+    from collections import deque
+
+    target = tuple(target_light_diagram)
+    start = tuple([False] * len(target_light_diagram))
+
+    if start == target:
+        return 0
+
+    queue = deque([(start, 0)])
+    visited = {start}
+
+    while queue:
+        state, presses = queue.popleft()
+
+        for button in buttons:
+            # Create new state by applying button
+            new_state = list(state)
+            for i in button:
+                new_state[i] = not new_state[i]
+            new_state = tuple(new_state)
+
+            if new_state == target:
+                return presses + 1
+
+            if new_state not in visited:
+                visited.add(new_state)
+                queue.append((new_state, presses + 1))
+
+    return -1
+
+
 @timer_func
 def solve1(data):
     """Solves part 1."""
@@ -111,7 +145,7 @@ def solve1(data):
     total_button_presses = 0
     for machine in machines:
         light_diagram, buttons, joltage_requirements = machine_parser(machine)
-        total_button_presses += min_button_presses(light_diagram, buttons)
+        total_button_presses += min_button_presses_bfs(light_diagram, buttons)
     return total_button_presses
 
 
@@ -190,7 +224,7 @@ if __name__ == "__main__":
             ),
         ]
         for i, (target, buttons, expected) in enumerate(test_cases, 1):
-            result = min_button_presses(target, buttons)
+            result = min_button_presses_bfs(target, buttons)
             assert result == expected, (
                 f"Test case {i} failed: expected {expected}, got {result}"
             )
