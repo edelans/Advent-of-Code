@@ -295,7 +295,7 @@ def min_button_presses_joltage_mode_linear_equations(
     n = len(joltage_requirements)
     m = len(buttons)
 
-    # Variables: X[j] = number of times button j is pressed
+    # Variables: X[j] = number of times button j is pressed, as integers
     x = [z3.Int(f"x_{j}") for j in range(m)]
     opt = z3.Optimize()
 
@@ -303,13 +303,14 @@ def min_button_presses_joltage_mode_linear_equations(
     for j in range(m):
         opt.add(x[j] >= 0)
 
-    # Constraints: B * X = J
-    # For each counter i, sum the presses of buttons that affect it
+    # For each joltage requirements (i), sum the x[j] presses of all the buttons j that affect it
     for i in range(n):
-        opt.add(
-            sum(x[j] for j, button in enumerate(buttons) if i in button)
-            == joltage_requirements[i]
-        )
+        relevant_x = []
+        for j, button in enumerate(buttons):
+            if i in button:
+                # this button j affects the joltage requirement i
+                relevant_x.append(x[j])
+        opt.add(sum(relevant_x) == joltage_requirements[i])
 
     # Objective: minimize sum(X)
     opt.minimize(z3.Sum(x))
