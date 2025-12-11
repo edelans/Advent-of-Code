@@ -80,6 +80,8 @@ def simplify_graph(G):
 
 
 def draw_graph(G, name):
+    """Draw the graph using pydot and save it to a file.
+    can then be used on https://dreampuf.github.io/GraphvizOnline to visualize the graph."""
     PG = nx.nx_pydot.to_pydot(G)
     with open(f"graph_{name}.dot", "w") as f:
         f.write(PG.to_string())
@@ -88,8 +90,16 @@ def draw_graph(G, name):
 
 def count_paths_dp(G, source, target):
     """Count paths from source to target using dynamic programming with topological sort.
-    Much faster than nx.all_simple_paths for DAGs."""
+    Dynamic programming (DP) solves a problem by
+      - breaking it into overlapping subproblems (here: How many paths from svr to node X)
+      - solving each once, relyng on previous results
+      - and storing results to avoid recomputation (here: Store path_counts[node])
+    Much faster than nx.all_simple_paths for DAGs (Directed Acyclic Graphs)."""
+
     # Get topological order
+    # which is a *non-unique* list of the nodes of a directed graph
+    # such that for any item in the list, all its predecessors are on its left,
+    # and all its successors are on its right
     try:
         topo_order = list(nx.topological_sort(G))
     except nx.NetworkXError:
@@ -100,79 +110,18 @@ def count_paths_dp(G, source, target):
     path_counts = dict.fromkeys(G.nodes(), 0)
     path_counts[source] = 1
 
-    # Process nodes in topological order
+    # Process nodes in topological order, breadth-first search style
+    # we skip source predecessors
+    # and we skip target successors
     for node in topo_order:
         if path_counts[node] == 0:
-            continue
+            continue  # skip nodes that can't be reached from the source
+        if node == target:
+            break  # we've computed path_counts[target], no need to continue
         for successor in G.successors(node):
             path_counts[successor] += path_counts[node]
 
     return path_counts[target]
-
-
-def find_articulation_points(G):
-    """Find articulation points (nodes whose removal increases number of connected components).
-    These are good candidates for 'hubs'."""
-    # Convert to undirected for articulation point detection
-    G_undirected = G.to_undirected()
-    return list(nx.articulation_points(G_undirected))
-
-
-def find_high_betweenness_nodes(G, top_k=None):
-    """Find nodes with high betweenness centrality - nodes on many shortest paths.
-    Good candidates for 'hubs'."""
-    betweenness = nx.betweenness_centrality(G)
-    sorted_nodes = sorted(betweenness.items(), key=lambda x: x[1], reverse=True)
-    if top_k:
-        return [node for node, _ in sorted_nodes[:top_k]]
-    return sorted_nodes
-
-
-def decompose_by_articulation_points(G, source, target):
-    """Decompose graph by removing articulation points, creating subgraphs.
-    Returns list of subgraphs and the articulation points."""
-    G_undirected = G.to_undirected()
-    articulation_points = list(nx.articulation_points(G_undirected))
-
-    # Create subgraphs by removing articulation points
-    subgraphs = []
-    G_copy = G.copy()
-    for ap in articulation_points:
-        if ap == source or ap == target:
-            continue  # Don't remove source/target
-        G_copy.remove_node(ap)
-        # Get connected components
-        for component in nx.weakly_connected_components(G_copy):
-            if len(component) > 1:
-                subgraphs.append(G.subgraph(component).copy())
-        G_copy = G.copy()  # Reset for next iteration
-
-    return subgraphs, articulation_points
-
-
-def find_biconnected_components(G):
-    """Find biconnected components - maximal sets of nodes where removal of any single node
-    doesn't disconnect the component. Useful for graph decomposition."""
-    G_undirected = G.to_undirected()
-    return list(nx.biconnected_components(G_undirected))
-
-
-def auto_identify_layers(G, source, target):
-    """Automatically identify layers/hubs using BFS from source.
-    Returns list of layers, where each layer contains nodes at the same distance from source."""
-    # BFS to find distances from source
-    distances = nx.single_source_shortest_path_length(G, source)
-    target_dist = distances.get(target)
-    if target_dist is None:
-        return []
-
-    # Group nodes by distance
-    layers = [[] for _ in range(target_dist + 1)]
-    for node, dist in distances.items():
-        if dist <= target_dist:
-            layers[dist].append(node)
-
-    return layers
 
 
 @timer_func
@@ -183,58 +132,20 @@ def solve2(data):
     source = "svr"
     target = "out"
 
-    # Option 1: Use DP with topological sort (fastest, no decomposition needed)
-    return count_paths_dp(G, source, target)
+    # which intermediary node preceeds the other ?  dac or fft ?
+    topo_order = list(nx.topological_sort(G))
+    if topo_order.index("dac") < topo_order.index("fft"):
+        stop1 = "dac"
+        stop2 = "fft"
+    else:
+        stop1 = "fft"
+        stop2 = "dac"
 
-    # Option 2: Auto-identify layers and use DP between layers
-    # layers = auto_identify_layers(G, source, target)
-    # if not layers:
-    #     return 0
-    #
-    # path_counts = {source: 1}
-    # for layer in layers[1:]:
-    #     new_path_counts = {}
-    #     for node in layer:
-    #         count = 0
-    #         for pred in G.predecessors(node):
-    #             if pred in path_counts:
-    #                 # Count paths from pred to node using DP on subgraph
-    #                 # For efficiency, we can use the fact that path_counts[pred] already
-    #                 # contains the count from source to pred
-    #                 subgraph_paths = count_paths_dp(G, pred, node)
-    #                 count += path_counts[pred] * subgraph_paths
-    #         new_path_counts[node] = count
-    #     path_counts = new_path_counts
-    #
-    # return path_counts.get(target, 0)
-
-    # Option 3: Use manual hubs (your original approach, but with DP instead of all_simple_paths)
-    # hubs = [
-    #     ["svr"],
-    #     ["ekx", "hmh", "qwm"],
-    #     ["kox", "pwk", "ehb", "uvj"],
-    #     ["iza", "tup", "qlh"],
-    #     ["oas", "vwj", "tui"],
-    #     ["eyi", "fmj", "gnu", "ugv", "mha"],
-    #     ["you", "heu", "cgh"],
-    #     ["out"],
-    # ]
-    #
-    # path_counts = {"svr": 1}
-    # for i, hub in enumerate(hubs[1:], start=1):
-    #     previous_hub_nodes = hubs[i - 1]
-    #     new_path_counts = {}
-    #     for node in hub:
-    #         total = 0
-    #         for predecessor in previous_hub_nodes:
-    #             if predecessor in path_counts:
-    #                 # Use DP instead of all_simple_paths
-    #                 incoming_paths = count_paths_dp(G, predecessor, node)
-    #                 total += incoming_paths * path_counts[predecessor]
-    #         new_path_counts[node] = total
-    #     path_counts = new_path_counts
-    #
-    # return path_counts.get("out", 0)
+    return (
+        count_paths_dp(G, source, stop1)
+        * count_paths_dp(G, stop1, stop2)
+        * count_paths_dp(G, stop2, target)
+    )
 
 
 """
